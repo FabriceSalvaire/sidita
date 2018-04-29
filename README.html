@@ -389,7 +389,11 @@ ul.auto-toc {
 <h1>Overview</h1>
 <div class="section" id="what-is-sidita">
 <h2>What is sidita ?</h2>
-<p>sidita is a Python module which implements ...</p>
+<p>Sidita is a Python module which implements a distributed task queue featuring an intermediate
+solution between the <a class="reference external" href="https://docs.python.org/3.6/library/multiprocessing.html">multiprocessing module</a> and a task scheduler like <a class="reference external" href="http://www.celeryproject.org">Celery</a>.</p>
+<p>The Sidita use case corresponds to the case where you need to run CPU bound tasks in parallel and
+you require an immunity to crashes, memory leaks and overruns.  Theses requirements are met by a
+monitored subprocess implementation.</p>
 </div>
 <div class="section" id="where-is-the-documentation">
 <h2>Where is the Documentation ?</h2>
@@ -398,7 +402,21 @@ ul.auto-toc {
 <div class="section" id="what-are-the-main-features">
 <h2>What are the main features ?</h2>
 <ul class="simple">
-<li>to be completed</li>
+<li>Must be a simple solution to circumvent to the GIL limitation : i.e. distribute and run tasks in parallel on local CPU cores</li>
+<li>Must be a lightweight solution to Celery : no broker</li>
+<li>Should be portable on main OS like Unix and Windows</li>
+<li>Scheduler is implemented using an <a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloops.html">asyncio event loop</a> and <a class="reference external" href="https://docs.python.org/3/library/asyncio-queue.html">asyncio queue</a></li>
+<li>Scheduler queue can be limited on size so as to prevent a memory overshoot at startup</li>
+<li>Workers are spawned using <a class="reference external" href="https://docs.python.org/3/library/asyncio-subprocess.html">asyncio subprocess</a> and communicate through a pipe (stdin, stdout)</li>
+<li>Pass any pickable object as request and response</li>
+<li>Scheduler monitors workers and restart them when they was killed or they exceeded a memory or timeout threshold</li>
+<li>Provide basic metrics on workers</li>
+</ul>
+<p>Technical details in brief:</p>
+<ul class="simple">
+<li>scheduler run a producer and N consumers coroutines in an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html">asyncio</a> event loop</li>
+<li>the producer coroutine awaits on <code>queue.put(task)</code> ( if a size limit is set )</li>
+<li>each consumer coroutine wraps a worker subprocess and await data on the stdout pipe</li>
 </ul>
 </div>
 <div class="section" id="how-to-install-it">
@@ -414,8 +432,8 @@ ul.auto-toc {
 <h1>News</h1>
 <!-- -*- Mode: rst -*- -->
 <!-- no title here -->
-<div class="section" id="v0-2018-10-01">
-<h2>V0 2018-10-01</h2>
+<div class="section" id="v0-2018-05-01">
+<h2>V0 2018-05-01</h2>
 <p>Started project</p>
 </div>
 </div>

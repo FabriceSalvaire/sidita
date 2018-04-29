@@ -6,11 +6,23 @@
 .. |PyPI| replace:: PyPI
 .. _PyPI: https://pypi.python.org/pypi
 
-.. |Numpy| replace:: Numpy
-.. _Numpy: http://www.numpy.org
-
-.. |IPython| replace:: IPython
-.. _IPython: http://ipython.org
-
 .. |Sphinx| replace:: Sphinx
 .. _Sphinx: http://sphinx-doc.org
+
+.. |asyncio| replace:: asyncio
+.. _asyncio: https://docs.python.org/3/library/asyncio.html
+
+.. |asyncio event loop| replace:: asyncio event loop
+.. _asyncio event loop: https://docs.python.org/3/library/asyncio-eventloops.html
+
+.. |asyncio queue| replace:: asyncio queue
+.. _asyncio queue: https://docs.python.org/3/library/asyncio-queue.html
+
+.. |asyncio subprocess| replace:: asyncio subprocess
+.. _asyncio subprocess: https://docs.python.org/3/library/asyncio-subprocess.html
+
+.. |multiprocessing module| replace:: multiprocessing module
+.. _multiprocessing module: https://docs.python.org/3.6/library/multiprocessing.html
+
+.. |Celery| replace:: Celery
+.. _Celery: http://www.celeryproject.org
