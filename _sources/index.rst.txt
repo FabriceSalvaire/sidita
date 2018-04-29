@@ -45,12 +45,12 @@
    :alt: sidita logo
    :width: 750
 
+.. important::
+   This doc was generated from a template a need to be completed ...
+
 ********
 Overview
 ********
-
-.. important::
-   This doc need to be completed ...
 
 sidita is a free and open source (*) Python module which interface |Python|_ ...
 
