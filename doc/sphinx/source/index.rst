@@ -45,6 +45,9 @@
    :alt: sidita logo
    :width: 750
 
+.. important::
+   This doc was generated from a template a need to be completed ...
+
 ********
 Overview
 ********
