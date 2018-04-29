@@ -313,4 +313,4 @@ intersphinx_mapping = {'http://docs.python.org/': None}
 # https://github.com/jdillard/sphinx-sitemap
 #
 
-site_url = '@project_url@' # could use setup_dict
+site_url = 'https://fabricesalvaire.github.io/sidita' # could use setup_dict
