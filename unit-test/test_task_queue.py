@@ -20,8 +20,8 @@
 
 ####################################################################################################
 
-import Babel.Logging.Logging as Logging
-logger = Logging.setup_logging('babel')
+import sidita.Logging
+logger = sidita.Logging.setup_logging('sidita')
 
 ####################################################################################################
 
@@ -31,7 +31,7 @@ import random
 import sys
 import unittest
 
-from Babel.TaskQueue.Manager import Manager
+from sidita.Manager import Manager
 
 ####################################################################################################
 

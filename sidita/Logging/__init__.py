@@ -20,14 +20,24 @@
 
 ####################################################################################################
 
-import sidita.Logging
-logger = sidita.Logging.setup_logging('sidita-worker')
+from pathlib import Path
+import yaml
+import logging
+import logging.config
 
 ####################################################################################################
 
-from sidita.Worker import Worker
+def setup_logging(application_name,
+                  config_file=Path(__file__).parent.joinpath('logging.yml')):
 
-####################################################################################################
+    logging_config = yaml.load(open(config_file))
 
-class TestWorker(Worker):
-    _logger = logger.getChild('Worker')
+    # Fixme: \033 is not interpreted in YAML
+    formatter_config = logging_config['formatters']['ansi']['format']
+    logging_config['formatters']['ansi']['format'] = formatter_config.replace('<ESC>', '\033')
+    logging.config.dictConfig(logging_config)
+
+    logger = logging.getLogger(application_name)
+    logger.info('Start %s' % (application_name))
+
+    return logger
