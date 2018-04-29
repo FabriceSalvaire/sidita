@@ -8,7 +8,7 @@ rm -rf ${api}
 
 echo
 echo Generate RST API files
-generate-rst-api sidita
+pyterate-rst-api sidita
 
 echo
 echo Run Sphinx
