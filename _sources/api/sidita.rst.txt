@@ -1,0 +1,15 @@
+
+========
+ sidita
+========
+
+.. toctree::
+    sidita/Manager
+    sidita/Message
+    sidita/Statistics
+    sidita/Worker
+    sidita/worker
+
+.. automodule:: sidita
+   :members:
+   :show-inheritance:

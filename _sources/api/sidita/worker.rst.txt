@@ -1,0 +1,8 @@
+
+========
+ worker
+========
+
+.. automodule:: sidita.worker
+   :members:
+   :show-inheritance:

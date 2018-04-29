@@ -1,0 +1,8 @@
+
+=========
+ Manager
+=========
+
+.. automodule:: sidita.Manager
+   :members:
+   :show-inheritance:
