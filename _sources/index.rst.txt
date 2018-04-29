@@ -49,6 +49,9 @@
 Overview
 ********
 
+.. important::
+   This doc need to be completed ...
+
 sidita is a free and open source (*) Python module which interface |Python|_ ...
 
 .. rst-class:: small-text
