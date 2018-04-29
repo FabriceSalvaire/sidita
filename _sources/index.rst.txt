@@ -46,7 +46,7 @@
    :width: 750
 
 .. important::
-   This doc was generated from a template a need to be completed ...
+   This doc was generated from a template and need to be completed ...
 
 ********
 Overview
