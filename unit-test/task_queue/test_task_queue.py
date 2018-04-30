@@ -31,13 +31,13 @@ import random
 import sys
 import unittest
 
-from sidita.Manager import Manager
+from sidita.TaskQueue import TaskQueue
 
 ####################################################################################################
 
-class MyManager(Manager):
+class MyTaskQueue(TaskQueue):
 
-    _logger = logger.getChild('MyManager')
+    _logger = logger.getChild('MyTaskQueue')
 
     ##############################################
 
@@ -67,7 +67,7 @@ class TestTaskQueue(unittest.TestCase):
 
         # sys.path
 
-        manager = MyManager(
+        task_queue = MyTaskQueue(
             python_path=Path(__file__).resolve().parent,
             worker_module='TestWorker',
             worker_cls='TestWorker',
@@ -76,7 +76,7 @@ class TestTaskQueue(unittest.TestCase):
             memory_check_interval=timedelta(seconds=5),
             task_timeout=timedelta(seconds=1),
         )
-        manager.run()
+        task_queue.run()
 
 ####################################################################################################
 

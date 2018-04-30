@@ -18,6 +18,9 @@
 #
 ####################################################################################################
 
+"""Implement a Task Queue.
+"""
+
 ####################################################################################################
 
 from datetime import datetime, timedelta
@@ -53,7 +56,7 @@ class Consumer:
 
     def __init__(self,
                  worker_id,
-                 manager,
+                 task_queue,
                  worker_main=DEFAULT_WORKER_MAIN,
                  python_path=None,
                  worker_module=DEFAULT_WORKER_MODULE,
@@ -64,7 +67,7 @@ class Consumer:
     ):
 
         self._id = worker_id
-        self._manager = manager
+        self._task_queue = task_queue
         self._worker_main = worker_main
         self._python_path = python_path
         self._worker_module = worker_module
@@ -99,7 +102,7 @@ class Consumer:
 
         while True:
             # await next task
-            task_metadata = await self._manager.get_task()
+            task_metadata = await self._task_queue.get_task()
             if task_metadata is None:
                 break # no more job to process
 
@@ -123,24 +126,24 @@ class Consumer:
             # submit task
             task_metadata.submit(self._id)
             self._message_stream.send(task_metadata.task)
-            self._manager.on_task_sent(task_metadata)
+            self._task_queue.on_task_sent(task_metadata)
 
             # await result
             try:
                 task_metadata.result = await self._message_stream.receive()
                 self._metrics.register_task_time(task_metadata.task_time_s)
-                self._manager.on_result(task_metadata)
+                self._task_queue.on_result(task_metadata)
             except asyncio.TimeoutError:
                 self._logger.info('Worker @{} timeout'.format(self._id))
                 self._metrics.register_timeout()
-                self._manager.on_timeout_error(task_metadata)
+                self._task_queue.on_timeout_error(task_metadata)
                 await self._stop_worker()
             except asyncio.streams.IncompleteReadError:
                 if self._process.returncode is not None:
                     self._metrics.register_crash()
                     self._logger.info('Worker @{} is dead'.format(self._id))
                     self._process = None
-                self._manager.on_stream_error(task_metadata)
+                self._task_queue.on_stream_error(task_metadata)
 
         # stop worker
         self._logger.info('Stop worker @{}'.format(self._id))
@@ -213,9 +216,9 @@ class Consumer:
 
 ####################################################################################################
 
-class Manager:
+class TaskQueue:
 
-    _logger = _module_logger.getChild('Manager')
+    _logger = _module_logger.getChild('TaskQueue')
 
     ##############################################
 
