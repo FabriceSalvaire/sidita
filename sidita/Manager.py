@@ -113,39 +113,191 @@ class TaskMetaData:
 
 ####################################################################################################
 
-class Manager:
+class Consumer:
 
     DEFAULT_WORKER_MAIN = Path(__file__).resolve().parent.joinpath('worker.py')
     DEFAULT_WORKER_MODULE = '.'.join(__name__.split('.')[:-1] + ['Worker']) # Fixme: api tool ?
     DEFAULT_WORKER_CLASS = 'Worker'
+
+    _logger = _module_logger.getChild('Consumer')
+
+    ##############################################
+
+    def __init__(self,
+                 worker_id,
+                 manager,
+                 worker_main=DEFAULT_WORKER_MAIN,
+                 python_path=None,
+                 worker_module=DEFAULT_WORKER_MODULE,
+                 worker_cls=DEFAULT_WORKER_CLASS,
+                 max_memory=0, # byte
+                 memory_check_interval=timedelta(minutes=1),
+                 task_timeout=None,
+    ):
+
+        self._id = worker_id
+        self._manager = manager
+        self._worker_main = worker_main
+        self._python_path = python_path
+        self._worker_module = worker_module
+        self._worker_cls = worker_cls
+        self._max_memory = max_memory
+        self._memory_check_interval = memory_check_interval
+        self._task_timeout = task_timeout
+
+        self._metrics = WorkerMetrics(self._id)
+        self._process = None
+        self._message_stream = None
+
+    ##############################################
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def metrics(self):
+        return self._metrics
+
+    @property
+    def dead(self):
+        return self._process is None
+
+    ##############################################
+
+    async def run(self):
+
+        last_memory_check = datetime.now()
+
+        while True:
+            # await next task
+            task_metadata = await self._manager.get_task()
+            if task_metadata is None:
+                break # no more job to process
+
+            # check memory
+            if self._max_memory and not self.dead:
+                now = datetime.now()
+                if now - last_memory_check > self._memory_check_interval:
+                    last_memory_check = now
+                    process_memory = self._get_process_memory()
+                    if process_memory > self._max_memory:
+                        self._logger.info('Worker @{} has reached memory limit {:.1f} > {:.1f} MB'.format(
+                            self._id, to_MB(process_memory), to_MB(self._max_memory)))
+                        await self._stop_worker()
+
+            # check is worker is dead
+            # Fixme: does it check for all worker crashes ???
+            if self.dead: # process.returncode is not None
+                self._logger.info('Restart Worker @{}'.format(self._id))
+                await self._create_worker()
+
+            # submit task
+            task_metadata.submit(self._id)
+            self._message_stream.send(task_metadata.task)
+            self._manager.on_task_sent(task_metadata)
+
+            # await result
+            try:
+                task_metadata.result = await self._message_stream.receive()
+                self._metrics.register_task_time(task_metadata.task_time_s)
+                self._manager.on_result(task_metadata)
+            except asyncio.TimeoutError:
+                self._logger.info('Worker @{} timeout'.format(self._id))
+                self._metrics.register_timeout()
+                await self._stop_worker()
+            except asyncio.streams.IncompleteReadError:
+                if self._process.returncode is not None:
+                    self._metrics.register_crash()
+                    self._logger.info('Worker @{} is dead'.format(self._id))
+                    self._process = None
+
+        # stop worker
+        self._logger.info('Stop worker @{}'.format(self._id))
+        if not self.dead:
+            await self._stop_worker()
+
+    ##############################################
+
+    async def _stop_worker(self):
+
+        process_memory = self._get_process_memory()
+        self._metrics.register_memory(process_memory)
+        try:
+            self._process.terminate()
+            await asyncio.sleep(1) # Fixme: better ?
+        except ProcessLookupError: # Fixme:
+            self._logger.info('Worker was killed @{} {}'.format(self._id, self._process.returncode))
+
+        self._process = None
+        self._message_stream = None
+
+    ##############################################
+
+    def _get_process_memory(self):
+
+        try:
+            process_metrics = psutil.Process(self._process.pid)
+            with process_metrics.oneshot():
+                memory_info = process_metrics.memory_full_info()
+                process_memory = memory_info.uss
+            return process_memory
+        except psutil._exceptions.NoSuchProcess: # Fixme:
+            return 0
+
+    ##############################################
+
+    async def _create_worker(self):
+
+        self._logger.info('Create worker @{}'.format(self._id))
+
+        command = [
+            sys.executable,
+            str(self._worker_main),
+            '--worker-module', self._worker_module,
+            '--worker-class', self._worker_cls,
+            '--worker-id', str(self._id),
+            ]
+        if self._python_path:
+            command += [
+                '--python-path', str(self._python_path),
+            ]
+
+        self._process = await asyncio.create_subprocess_exec(
+            *command,
+            stdout=asyncio.subprocess.PIPE,
+            stdin=asyncio.subprocess.PIPE,
+        )
+
+        if self._task_timeout is not None:
+            timeout = self._task_timeout.total_seconds()
+        else:
+            timeout = None
+        self._message_stream = AsyncMessageStream(
+            self._process.stdin,
+            self._process.stdout,
+            timeout=timeout,
+        )
+
+        self._metrics.register_restart()
+
+####################################################################################################
+
+class Manager:
 
     _logger = _module_logger.getChild('Manager')
 
     ##############################################
 
     def __init__(self,
-                 worker_main=DEFAULT_WORKER_MAIN,
-                 python_path=None,
-                 worker_module=DEFAULT_WORKER_MODULE,
-                 worker_cls=DEFAULT_WORKER_CLASS,
                  number_of_workers=None,
                  max_queue_size=0,
-                 max_memory=0, # byte
-                 memory_check_interval=timedelta(minutes=1),
-                 task_timeout=None,
+                 **kwargs,
     ):
 
-        self._worker_main = worker_main
-        self._python_path = python_path
-        self._worker_module = worker_module
-        self._worker_cls = worker_cls
         self._number_of_workers = number_of_workers or os.cpu_count()
         self._max_queue_size = max_queue_size
-        self._max_memory = max_memory
-        self._memory_check_interval = memory_check_interval
-        self._task_timeout = task_timeout
-
-        self._worker_metrics = [WorkerMetrics(i) for i in range(self._number_of_workers)]
+        self._consumer_kwargs = kwargs
 
     ##############################################
 
@@ -170,16 +322,17 @@ class Manager:
         self._queue = asyncio.Queue(maxsize=self._max_queue_size, loop=loop)
 
         task_producer = self.task_producer()
-        task_consumers = [self._task_consumer(i) for i in range(self._number_of_workers)]
+        task_consumers = [Consumer(i, self, **self._consumer_kwargs)
+                          for i in range(self._number_of_workers)]
 
         loop.run_until_complete(asyncio.gather(
             task_producer,
-            *task_consumers,
+            *[task_consumer.run() for task_consumer in task_consumers],
         ))
         loop.close()
 
-        for worker_metrics in self._worker_metrics:
-            self._logger.info(worker_metrics.dump_statistics())
+        for consumer in task_consumers:
+            self._logger.info(consumer.metrics.dump_statistics())
 
     ##############################################
 
@@ -209,126 +362,9 @@ class Manager:
 
     ##############################################
 
-    async def _task_consumer(self, worker_id):
+    async def get_task(self):
 
-        worker_metrics = self._worker_metrics[worker_id]
-
-        process, message_stream = await self._create_worker(worker_id)
-        dead = False
-        worker_metrics.register_restart()
-
-        last_memory_check = datetime.now()
-
-        while True:
-            # await next task
-            task_metadata = await self._queue.get()
-            if task_metadata is None:
-                break # no more job to process
-
-            # check memory
-            if self._max_memory and not dead:
-                now = datetime.now()
-                if now - last_memory_check > self._memory_check_interval:
-                    last_memory_check = now
-                    process_memory = self._get_process_memory(process)
-                    if process_memory > self._max_memory:
-                        self._logger.info('Worker @{} has reached memory limit {:.1f} > {:.1f} MB'.format(
-                            worker_id, to_MB(process_memory), to_MB(self._max_memory)))
-                        worker_metrics.register_memory(process_memory)
-                        process.terminate()
-                        await asyncio.sleep(1) # Fixme: better ?
-                        dead = True
-
-            # check is worker is dead
-            # Fixme: does it check for all worker crashes ???
-            if dead: # process.returncode is not None
-                self._logger.info('Restart Worker @{}'.format(worker_id))
-                process, message_stream = await self._create_worker(worker_id)
-                dead = False
-                worker_metrics.register_restart()
-
-            # submit task
-            task_metadata.submit(worker_id)
-            message_stream.send(task_metadata.task)
-            self.on_task_sent(task_metadata)
-
-            # await result
-            try:
-                task_metadata.result = await message_stream.receive()
-                worker_metrics.register_task_time(task_metadata.task_time_s)
-                self.on_result(task_metadata)
-            except asyncio.TimeoutError:
-                self._logger.info('Worker @{} timeout'.format(worker_id))
-                worker_metrics.register_timeout()
-                await self._stop_worker(process, worker_metrics)
-                dead = True
-            except asyncio.streams.IncompleteReadError:
-                if process.returncode is not None:
-                    worker_metrics.register_crash()
-                    self._logger.info('Worker @{} is dead'.format(worker_id))
-                    dead = True
-
-        # stop worker
-        self._logger.info('Stop worker @{}'.format(worker_id))
-        if not dead:
-            await self._stop_worker(process, worker_metrics)
-
-    ##############################################
-
-    async def _stop_worker(self, process, worker_metrics):
-
-        process_memory = self._get_process_memory(process)
-        worker_metrics.register_memory(process_memory)
-        try:
-            process.terminate()
-            await asyncio.sleep(1) # Fixme: better ?
-        except ProcessLookupError: # Fixme:
-            self._logger.info('Worker was killed @{} {}'.format(worker_id, process.returncode))
-
-    ##############################################
-
-    def _get_process_memory(self, process):
-
-        try:
-            process_metrics = psutil.Process(process.pid)
-            with process_metrics.oneshot():
-                memory_info = process_metrics.memory_full_info()
-                process_memory = memory_info.uss
-            return process_memory
-        except psutil._exceptions.NoSuchProcess: # Fixme:
-            return 0
-
-    ##############################################
-
-    async def _create_worker(self, worker_id):
-
-        self._logger.info('Create worker @{}'.format(worker_id))
-
-        command = [
-            sys.executable,
-            str(self._worker_main),
-            '--worker-module', self._worker_module,
-            '--worker-class', self._worker_cls,
-            '--worker-id', str(worker_id),
-            ]
-        if self._python_path:
-            command += [
-                '--python-path', str(self._python_path),
-            ]
-
-        process = await asyncio.create_subprocess_exec(
-            *command,
-            stdout=asyncio.subprocess.PIPE,
-            stdin=asyncio.subprocess.PIPE,
-        )
-
-        if self._task_timeout is not None:
-            timeout = self._task_timeout.total_seconds()
-        else:
-            timeout = None
-        message_stream = AsyncMessageStream(process.stdin, process.stdout, timeout=timeout)
-
-        return process, message_stream
+        return await self._queue.get()
 
     ##############################################
 
