@@ -60,7 +60,8 @@ class Worker:
         while True:
             message = message_stream.receive()
             self._logger.info('Worker @{} received {}'.format(self._worker_id, message))
-            time.sleep(random.random()/1000)
+            # time.sleep(random.random()/1000)
+            time.sleep(random.random()*10)
             # if random.random() < .1:
             #     1/0
             self._pool.append(np.ones(1024*100))

@@ -41,9 +41,9 @@ __all__ = [
 
 ####################################################################################################
 
+import asyncio
 import pickle
 import struct
-import sys
 
 ####################################################################################################
 
@@ -145,6 +145,14 @@ class AsyncMessageStream(MessageStream):
 
     ##############################################
 
+    def __init__(self, input_stream, output_stream, timeout=None):
+
+        super().__init__(input_stream, output_stream)
+
+        self._timeout = int(timeout)
+
+    ##############################################
+
     async def receive(self):
 
         data = await self.read(HEADER_LENGTH)
@@ -160,4 +168,9 @@ class AsyncMessageStream(MessageStream):
     ##############################################
 
     async def read(self, length):
-        return await self._output.readexactly(length)
+
+        future = self._output.readexactly(length)
+        if self._timeout is not None:
+            return await asyncio.wait_for(future, self._timeout)
+        else:
+            return await future

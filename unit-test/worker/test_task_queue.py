@@ -43,7 +43,7 @@ class MyManager(Manager):
 
     async def task_producer(self):
 
-        N = 1000
+        N = 10
 
         for i in range(1, N + 1):
             self._logger.info('Producing {}/{}'.format(i, N))
@@ -74,6 +74,7 @@ class TestTaskQueue(unittest.TestCase):
             max_queue_size=100,
             max_memory=100*1024**2,
             memory_check_interval=timedelta(seconds=5),
+            task_timeout=timedelta(seconds=1),
         )
         manager.run()
 

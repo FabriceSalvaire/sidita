@@ -33,6 +33,7 @@ class WorkerMetrics:
 
         self._worker_id = worker_id
         self._crash = 0
+        self._timeout = 0
         self._restart = 0
         self._memory = DataSetMoment()
         self._task_time = DataSetMoment()
@@ -41,6 +42,11 @@ class WorkerMetrics:
 
     def register_crash(self):
         self._crash += 1
+
+    ##############################################
+
+    def register_timeout(self):
+        self._timeout += 1
 
     ##############################################
 
@@ -69,6 +75,7 @@ class WorkerMetrics:
         template = '''
 Worker @{0._worker_id}: {0._task_time.number_of_entries} Tasks
   number of crashs: {0._crash}
+  number of timeout: {0._timeout}
   number of restarts: {0._restart}
 '''
         text = template.format(self)

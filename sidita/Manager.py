@@ -130,8 +130,9 @@ class Manager:
                  worker_cls=DEFAULT_WORKER_CLASS,
                  number_of_workers=None,
                  max_queue_size=0,
-                 max_memory=0,
+                 max_memory=0, # byte
                  memory_check_interval=timedelta(minutes=1),
+                 task_timeout=None,
     ):
 
         self._worker_main = worker_main
@@ -142,6 +143,7 @@ class Manager:
         self._max_queue_size = max_queue_size
         self._max_memory = max_memory
         self._memory_check_interval = memory_check_interval
+        self._task_timeout = task_timeout
 
         self._worker_metrics = [WorkerMetrics(i) for i in range(self._number_of_workers)]
 
@@ -218,10 +220,12 @@ class Manager:
         last_memory_check = datetime.now()
 
         while True:
+            # await next task
             task_metadata = await self._queue.get()
             if task_metadata is None:
                 break # no more job to process
 
+            # check memory
             if self._max_memory and not dead:
                 now = datetime.now()
                 if now - last_memory_check > self._memory_check_interval:
@@ -235,35 +239,51 @@ class Manager:
                         await asyncio.sleep(1) # Fixme: better ?
                         dead = True
 
+            # check is worker is dead
+            # Fixme: does it check for all worker crashes ???
             if dead: # process.returncode is not None
                 self._logger.info('Restart Worker @{}'.format(worker_id))
                 process, message_stream = await self._create_worker(worker_id)
                 dead = False
                 worker_metrics.register_restart()
 
+            # submit task
             task_metadata.submit(worker_id)
             message_stream.send(task_metadata.task)
             self.on_task_sent(task_metadata)
 
+            # await result
             try:
                 task_metadata.result = await message_stream.receive()
                 worker_metrics.register_task_time(task_metadata.task_time_s)
                 self.on_result(task_metadata)
+            except asyncio.TimeoutError:
+                self._logger.info('Worker @{} timeout'.format(worker_id))
+                worker_metrics.register_timeout()
+                await self._stop_worker(process, worker_metrics)
+                dead = True
             except asyncio.streams.IncompleteReadError:
                 if process.returncode is not None:
                     worker_metrics.register_crash()
                     self._logger.info('Worker @{} is dead'.format(worker_id))
                     dead = True
 
-        self._logger.info('Exit worker @{}'.format(worker_id))
+        # stop worker
+        self._logger.info('Stop worker @{}'.format(worker_id))
         if not dead:
-            process_memory = self._get_process_memory(process)
-            worker_metrics.register_memory(process_memory)
-            try:
-                process.terminate()
-                await asyncio.sleep(1) # Fixme: better ?
-            except ProcessLookupError: # Fixme:
-                self._logger.info('Worker was killed @{} {}'.format(worker_id, process.returncode))
+            await self._stop_worker(process, worker_metrics)
+
+    ##############################################
+
+    async def _stop_worker(self, process, worker_metrics):
+
+        process_memory = self._get_process_memory(process)
+        worker_metrics.register_memory(process_memory)
+        try:
+            process.terminate()
+            await asyncio.sleep(1) # Fixme: better ?
+        except ProcessLookupError: # Fixme:
+            self._logger.info('Worker was killed @{} {}'.format(worker_id, process.returncode))
 
     ##############################################
 
@@ -302,7 +322,11 @@ class Manager:
             stdin=asyncio.subprocess.PIPE,
         )
 
-        message_stream = AsyncMessageStream(process.stdin, process.stdout)
+        if self._task_timeout is not None:
+            timeout = self._task_timeout.total_seconds()
+        else:
+            timeout = None
+        message_stream = AsyncMessageStream(process.stdin, process.stdout, timeout=timeout)
 
         return process, message_stream
 
