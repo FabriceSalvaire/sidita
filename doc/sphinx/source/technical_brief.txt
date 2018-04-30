@@ -1,0 +1,12 @@
+.. -*- Mode: rst -*-
+
+.. include:: abbreviation.txt
+.. include:: project-links.txt
+
+.. no title here
+
+Technical details in brief:
+
+* scheduler run a producer and N consumers coroutines in an |asyncio|_ event loop
+* the producer coroutine awaits on :code:`queue.put(task)` ( if a size limit is set )
+* each consumer coroutine wraps a worker subprocess and await data on the stdout pipe

@@ -20,7 +20,7 @@
 
 """Module to implement some units like duration and byte.
 
-See also :mode:`datetime.timedelta` for duration.
+See also :mod:`datetime.timedelta` for duration.
 
 Example of usage::
 

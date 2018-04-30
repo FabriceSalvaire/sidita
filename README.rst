@@ -112,6 +112,11 @@ The documentation is available on the |siditaHomePage|_.
 What are the main features ?
 ----------------------------
 
+.. -*- Mode: rst -*-
+
+
+.. no title here
+
 * Must be a simple solution to circumvent to the GIL limitation : i.e. distribute and run tasks in parallel on local CPU cores
 * Must be a lightweight solution to Celery : no broker
 * Should be portable on main OS like Unix and Windows
@@ -121,6 +126,17 @@ What are the main features ?
 * Pass any pickable object as request and response
 * Scheduler monitors workers and restart them when they was killed or they exceeded a memory or timeout threshold
 * Provide basic metrics on workers
+
+Technical details in brief:
+
+* scheduler run a producer and N consumers coroutines in an |asyncio|_ event loop
+* the producer coroutine awaits on :code:`queue.put(task)` ( if a size limit is set )
+* each consumer coroutine wraps a worker subprocess and await data on the stdout pipe
+
+.. -*- Mode: rst -*-
+
+
+.. no title here
 
 Technical details in brief:
 

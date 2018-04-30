@@ -401,6 +401,8 @@ monitored subprocess implementation.</p>
 </div>
 <div class="section" id="what-are-the-main-features">
 <h2>What are the main features ?</h2>
+<!-- -*- Mode: rst -*- -->
+<!-- no title here -->
 <ul class="simple">
 <li>Must be a simple solution to circumvent to the GIL limitation : i.e. distribute and run tasks in parallel on local CPU cores</li>
 <li>Must be a lightweight solution to Celery : no broker</li>
@@ -412,6 +414,14 @@ monitored subprocess implementation.</p>
 <li>Scheduler monitors workers and restart them when they was killed or they exceeded a memory or timeout threshold</li>
 <li>Provide basic metrics on workers</li>
 </ul>
+<p>Technical details in brief:</p>
+<ul class="simple">
+<li>scheduler run a producer and N consumers coroutines in an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html">asyncio</a> event loop</li>
+<li>the producer coroutine awaits on <code>queue.put(task)</code> ( if a size limit is set )</li>
+<li>each consumer coroutine wraps a worker subprocess and await data on the stdout pipe</li>
+</ul>
+<!-- -*- Mode: rst -*- -->
+<!-- no title here -->
 <p>Technical details in brief:</p>
 <ul class="simple">
 <li>scheduler run a producer and N consumers coroutines in an <a class="reference external" href="https://docs.python.org/3/library/asyncio.html">asyncio</a> event loop</li>

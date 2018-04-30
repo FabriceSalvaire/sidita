@@ -1,12 +1,9 @@
+.. -*- Mode: rst -*-
+
 .. include:: abbreviation.txt
+.. include:: project-links.txt
 
-.. _design-note-page:
-
-==============
- Design Notes
-==============
-
-.. cf. README.txt
+.. no title here
 
 * Must be a simple solution to circumvent to the GIL limitation : i.e. distribute and run tasks in parallel on local CPU cores
 * Must be a lightweight solution to Celery : no broker

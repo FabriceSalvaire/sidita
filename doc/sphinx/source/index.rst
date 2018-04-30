@@ -45,14 +45,12 @@
    :alt: sidita logo
    :width: 750
 
-.. important::
-   This doc was generated from a template and need to be completed ...
-
 ********
 Overview
 ********
 
-sidita is a free and open source (*) Python module which interface |Python|_ ...
+Sidita is a Python module which implements a distributed task queue featuring an intermediate
+solution between the |multiprocessing module|_ and a task scheduler like |Celery|_.
 
 .. rst-class:: small-text
 
