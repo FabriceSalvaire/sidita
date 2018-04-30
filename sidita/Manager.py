@@ -31,85 +31,13 @@ import sys
 import psutil
 
 from .Message import AsyncMessageStream
+from .TaskMetaData import TaskMetaData
 from .Units import to_MB
 from .WorkerMetrics import WorkerMetrics
 
 ####################################################################################################
 
 _module_logger = logging.getLogger(__name__)
-
-####################################################################################################
-
-class TaskMetaData:
-
-    LAST_TASK_ID = -1
-
-    ##############################################
-
-    def __init__(self, task):
-
-        self._task = task
-        self.LAST_TASK_ID += 1
-        self._task_id = self.LAST_TASK_ID
-        self._result = None
-
-        self._woker_id = None
-        self._submitted_date = datetime.now()
-        self._sent_date = None
-        self._result_date = None
-
-    ##############################################
-
-    @property
-    def task(self):
-        return self._task
-
-    @property
-    def task_id(self):
-        return self._task_id
-
-    @property
-    def result(self):
-        return self._result
-
-    @property
-    def worker_id(self):
-        return self._worker_id
-
-    @property
-    def submitted_date(self):
-        return self._submitted_date
-
-    @property
-    def sent_date(self):
-        return self._submitted_date
-
-    @property
-    def result_date(self):
-        return self._submitted_date
-
-    @property
-    def task_time(self):
-        return self._result_date - self._sent_date
-
-    @property
-    def task_time_s(self):
-        return (self._result_date - self._sent_date).total_seconds()
-
-    ##############################################
-
-    def submit(self, worker_id):
-
-        self._worker_id = worker_id
-        self._sent_date = datetime.now()
-
-    ##############################################
-
-    @result.setter
-    def result(self, value):
-
-        self._result = value
-        self._result_date = datetime.now()
 
 ####################################################################################################
 
@@ -186,7 +114,7 @@ class Consumer:
                             self._id, to_MB(process_memory), to_MB(self._max_memory)))
                         await self._stop_worker()
 
-            # check is worker is dead
+            # check if worker is alive
             # Fixme: does it check for all worker crashes ???
             if self.dead: # process.returncode is not None
                 self._logger.info('Restart Worker @{}'.format(self._id))
@@ -205,12 +133,14 @@ class Consumer:
             except asyncio.TimeoutError:
                 self._logger.info('Worker @{} timeout'.format(self._id))
                 self._metrics.register_timeout()
+                self._manager.on_timeout_error(task_metadata)
                 await self._stop_worker()
             except asyncio.streams.IncompleteReadError:
                 if self._process.returncode is not None:
                     self._metrics.register_crash()
                     self._logger.info('Worker @{} is dead'.format(self._id))
                     self._process = None
+                self._manager.on_stream_error(task_metadata)
 
         # stop worker
         self._logger.info('Stop worker @{}'.format(self._id))
@@ -383,3 +313,15 @@ class Manager:
     def on_result(self, task_metadata):
 
         self._logger.info('Result for task {0.task} from @{0.worker_id}\n{0.result}'.format(task_metadata))
+
+    ##############################################
+
+    def on_timeout_error(self, task_metadata):
+
+        pass
+
+    ##############################################
+
+    def on_stream_error(self, task_metadata):
+
+        pass
