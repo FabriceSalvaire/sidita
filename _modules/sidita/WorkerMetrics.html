@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>sidita.Worker &mdash; sidita 0.1.0 documentation</title>
+  <title>sidita.WorkerMetrics &mdash; sidita 0.1.0 documentation</title>
   
 
   
@@ -186,7 +186,7 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-      <li>sidita.Worker</li>
+      <li>sidita.WorkerMetrics</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -201,7 +201,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for sidita.Worker</h1><div class="highlight"><pre>
+  <h1>Source code for sidita.WorkerMetrics</h1><div class="highlight"><pre>
 <span></span><span class="c1">####################################################################################################</span>
 <span class="c1">#</span>
 <span class="c1"># sidita - Simple Distributed Task Queue</span>
@@ -222,57 +222,78 @@
 <span class="c1">#</span>
 <span class="c1">####################################################################################################</span>
 
-<span class="sd">&quot;&quot;&quot;Implements default worker.</span>
+<span class="sd">&quot;&quot;&quot;Implements worker metrics.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1">####################################################################################################</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">time</span>
-
-<span class="kn">from</span> <span class="nn">.Message</span> <span class="k">import</span> <span class="n">StandardMessageStream</span>
+<span class="kn">from</span> <span class="nn">.Statistics</span> <span class="k">import</span> <span class="n">DataSetMoment</span>
+<span class="kn">from</span> <span class="nn">.Units</span> <span class="k">import</span> <span class="n">to_MB</span>
 
 <span class="c1">####################################################################################################</span>
 
-<span class="n">_module_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-
-<span class="c1">####################################################################################################</span>
-
-<div class="viewcode-block" id="Worker"><a class="viewcode-back" href="../../api/sidita/Worker.html#sidita.Worker.Worker">[docs]</a><span class="k">class</span> <span class="nc">Worker</span><span class="p">:</span>
-
-    <span class="n">_logger</span> <span class="o">=</span> <span class="n">_module_logger</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;Worker&#39;</span><span class="p">)</span> <span class="c1"># Fixme: must write to stderr</span>
+<div class="viewcode-block" id="WorkerMetrics"><a class="viewcode-back" href="../../api/sidita/WorkerMetrics.html#sidita.WorkerMetrics.WorkerMetrics">[docs]</a><span class="k">class</span> <span class="nc">WorkerMetrics</span><span class="p">:</span>
 
     <span class="c1">##############################################</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_id</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_worker_id</span> <span class="o">=</span> <span class="n">worker_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_crash</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_restart</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_memory</span> <span class="o">=</span> <span class="n">DataSetMoment</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_task_time</span> <span class="o">=</span> <span class="n">DataSetMoment</span><span class="p">()</span>
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Worker.run"><a class="viewcode-back" href="../../api/sidita/Worker.html#sidita.Worker.Worker.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start Worker @</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_worker_id</span><span class="p">))</span>
-
-        <span class="n">message_stream</span> <span class="o">=</span> <span class="n">StandardMessageStream</span><span class="p">(</span>
-            <span class="n">input_stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">,</span>
-            <span class="n">output_stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">task</span> <span class="o">=</span> <span class="n">message_stream</span><span class="o">.</span><span class="n">receive</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Worker @</span><span class="si">{}</span><span class="s1"> received </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_worker_id</span><span class="p">,</span> <span class="n">task</span><span class="p">))</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_task</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
-            <span class="n">message_stream</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+<div class="viewcode-block" id="WorkerMetrics.register_crash"><a class="viewcode-back" href="../../api/sidita/WorkerMetrics.html#sidita.WorkerMetrics.WorkerMetrics.register_crash">[docs]</a>    <span class="k">def</span> <span class="nf">register_crash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_crash</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Worker.on_task"><a class="viewcode-back" href="../../api/sidita/Worker.html#sidita.Worker.Worker.on_task">[docs]</a>    <span class="k">def</span> <span class="nf">on_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">task</span></div></div>
+<div class="viewcode-block" id="WorkerMetrics.register_timeout"><a class="viewcode-back" href="../../api/sidita/WorkerMetrics.html#sidita.WorkerMetrics.WorkerMetrics.register_timeout">[docs]</a>    <span class="k">def</span> <span class="nf">register_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+    <span class="c1">##############################################</span>
+
+<div class="viewcode-block" id="WorkerMetrics.register_restart"><a class="viewcode-back" href="../../api/sidita/WorkerMetrics.html#sidita.WorkerMetrics.WorkerMetrics.register_restart">[docs]</a>    <span class="k">def</span> <span class="nf">register_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_restart</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+    <span class="c1">##############################################</span>
+
+<div class="viewcode-block" id="WorkerMetrics.register_memory"><a class="viewcode-back" href="../../api/sidita/WorkerMetrics.html#sidita.WorkerMetrics.WorkerMetrics.register_memory">[docs]</a>    <span class="k">def</span> <span class="nf">register_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memory</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_memory</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span></div>
+
+    <span class="c1">##############################################</span>
+
+<div class="viewcode-block" id="WorkerMetrics.register_task_time"><a class="viewcode-back" href="../../api/sidita/WorkerMetrics.html#sidita.WorkerMetrics.WorkerMetrics.register_task_time">[docs]</a>    <span class="k">def</span> <span class="nf">register_task_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_time</span><span class="p">):</span>
+
+        <span class="c1"># if worker_id not in self._task_time:</span>
+        <span class="c1">#     self._task_time[worker_id] = DataSetMoment()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_task_time</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">task_time</span><span class="p">)</span></div>
+
+    <span class="c1">##############################################</span>
+
+<div class="viewcode-block" id="WorkerMetrics.dump_statistics"><a class="viewcode-back" href="../../api/sidita/WorkerMetrics.html#sidita.WorkerMetrics.WorkerMetrics.dump_statistics">[docs]</a>    <span class="k">def</span> <span class="nf">dump_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">template</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">Worker @</span><span class="si">{0._worker_id}</span><span class="s1">: </span><span class="si">{0._task_time.number_of_entries}</span><span class="s1"> Tasks</span>
+<span class="s1">  number of crashs: </span><span class="si">{0._crash}</span><span class="s1"></span>
+<span class="s1">  number of timeout: </span><span class="si">{0._timeout}</span><span class="s1"></span>
+<span class="s1">  number of restarts: </span><span class="si">{0._restart}</span><span class="s1"></span>
+<span class="s1">&#39;&#39;&#39;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_memory</span><span class="p">:</span>
+            <span class="n">avg_memory</span> <span class="o">=</span> <span class="n">to_MB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_memory</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;  avg memory: </span><span class="si">{:.1f}</span><span class="s1"> MB</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">avg_memory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task_time</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;  avg task time: </span><span class="si">{0._task_time.mean:.3f}</span><span class="s1">s</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">text</span></div></div>
 </pre></div>
 
            </div>

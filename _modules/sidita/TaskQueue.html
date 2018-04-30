@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>sidita.Manager &mdash; sidita 0.1.0 documentation</title>
+  <title>sidita.TaskQueue &mdash; sidita 0.1.0 documentation</title>
   
 
   
@@ -186,7 +186,7 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-      <li>sidita.Manager</li>
+      <li>sidita.TaskQueue</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -201,7 +201,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for sidita.Manager</h1><div class="highlight"><pre>
+  <h1>Source code for sidita.TaskQueue</h1><div class="highlight"><pre>
 <span></span><span class="c1">####################################################################################################</span>
 <span class="c1">#</span>
 <span class="c1"># sidita - Simple Distributed Task Queue</span>
@@ -221,6 +221,10 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 <span class="c1">#</span>
 <span class="c1">####################################################################################################</span>
+
+<span class="sd">&quot;&quot;&quot;Implement a Task Queue using an asyncio event loop and queue.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1">####################################################################################################</span>
 
@@ -245,7 +249,7 @@
 
 <span class="c1">####################################################################################################</span>
 
-<div class="viewcode-block" id="Consumer"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Consumer">[docs]</a><span class="k">class</span> <span class="nc">Consumer</span><span class="p">:</span>
+<div class="viewcode-block" id="Consumer"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.Consumer">[docs]</a><span class="k">class</span> <span class="nc">Consumer</span><span class="p">:</span>
 
     <span class="n">DEFAULT_WORKER_MAIN</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;worker.py&#39;</span><span class="p">)</span>
     <span class="n">DEFAULT_WORKER_MODULE</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Worker&#39;</span><span class="p">])</span> <span class="c1"># Fixme: api tool ?</span>
@@ -257,7 +261,7 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">worker_id</span><span class="p">,</span>
-                 <span class="n">manager</span><span class="p">,</span>
+                 <span class="n">task_queue</span><span class="p">,</span>
                  <span class="n">worker_main</span><span class="o">=</span><span class="n">DEFAULT_WORKER_MAIN</span><span class="p">,</span>
                  <span class="n">python_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">worker_module</span><span class="o">=</span><span class="n">DEFAULT_WORKER_MODULE</span><span class="p">,</span>
@@ -268,7 +272,7 @@
     <span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">worker_id</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span> <span class="o">=</span> <span class="n">manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_task_queue</span> <span class="o">=</span> <span class="n">task_queue</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_worker_main</span> <span class="o">=</span> <span class="n">worker_main</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_python_path</span> <span class="o">=</span> <span class="n">python_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_worker_module</span> <span class="o">=</span> <span class="n">worker_module</span>
@@ -297,13 +301,13 @@
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Consumer.run"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Consumer.run">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Consumer.run"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.Consumer.run">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="n">last_memory_check</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="c1"># await next task</span>
-            <span class="n">task_metadata</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">get_task</span><span class="p">()</span>
+            <span class="n">task_metadata</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task_queue</span><span class="o">.</span><span class="n">get_task</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">task_metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">break</span> <span class="c1"># no more job to process</span>
 
@@ -325,26 +329,28 @@
                 <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_worker</span><span class="p">()</span>
 
             <span class="c1"># submit task</span>
-            <span class="n">task_metadata</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+            <span class="n">task_metadata</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_message_stream</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">task_metadata</span><span class="o">.</span><span class="n">task</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">on_task_sent</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_task_queue</span><span class="o">.</span><span class="n">on_task_sent</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">)</span>
 
             <span class="c1"># await result</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">task_metadata</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message_stream</span><span class="o">.</span><span class="n">receive</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span><span class="o">.</span><span class="n">register_task_time</span><span class="p">(</span><span class="n">task_metadata</span><span class="o">.</span><span class="n">task_time_s</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">on_result</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_task_queue</span><span class="o">.</span><span class="n">on_result</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">)</span>
             <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Worker @</span><span class="si">{}</span><span class="s1"> timeout&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">))</span>
+                <span class="n">task_metadata</span><span class="o">.</span><span class="n">set_timeout</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span><span class="o">.</span><span class="n">register_timeout</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">on_timeout_error</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_task_queue</span><span class="o">.</span><span class="n">on_timeout_error</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">)</span>
                 <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop_worker</span><span class="p">()</span>
             <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">IncompleteReadError</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process</span><span class="o">.</span><span class="n">returncode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">task_metadata</span><span class="o">.</span><span class="n">set_error</span><span class="p">()</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span><span class="o">.</span><span class="n">register_crash</span><span class="p">()</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Worker @</span><span class="si">{}</span><span class="s1"> is dead&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">))</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_process</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">on_stream_error</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_task_queue</span><span class="o">.</span><span class="n">on_stream_error</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">)</span>
 
         <span class="c1"># stop worker</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Stop worker @</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">))</span>
@@ -417,9 +423,9 @@
 
 <span class="c1">####################################################################################################</span>
 
-<div class="viewcode-block" id="Manager"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Manager">[docs]</a><span class="k">class</span> <span class="nc">Manager</span><span class="p">:</span>
+<div class="viewcode-block" id="TaskQueue"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.TaskQueue">[docs]</a><span class="k">class</span> <span class="nc">TaskQueue</span><span class="p">:</span>
 
-    <span class="n">_logger</span> <span class="o">=</span> <span class="n">_module_logger</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;Manager&#39;</span><span class="p">)</span>
+    <span class="n">_logger</span> <span class="o">=</span> <span class="n">_module_logger</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;TaskQueue&#39;</span><span class="p">)</span>
 
     <span class="c1">##############################################</span>
 
@@ -450,7 +456,7 @@
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Manager.run"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Manager.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskQueue.run"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.TaskQueue.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="n">loop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event_loop</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_queue_size</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">)</span>
@@ -470,7 +476,7 @@
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Manager.task_producer"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Manager.task_producer">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">task_producer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskQueue.task_producer"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.TaskQueue.task_producer">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">task_producer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="c1"># self.submit(message)</span>
         <span class="c1"># self.send_stop()</span>
@@ -479,7 +485,7 @@
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Manager.submit"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Manager.submit">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskQueue.submit"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.TaskQueue.submit">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
 
         <span class="n">task_metadata</span> <span class="o">=</span> <span class="n">TaskMetaData</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_task_submitted</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">)</span>
@@ -487,7 +493,7 @@
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Manager.send_stop"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Manager.send_stop">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">send_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskQueue.send_stop"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.TaskQueue.send_stop">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">send_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="c1"># indicate the producer is done</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Send stop to workers&#39;</span><span class="p">)</span>
@@ -496,37 +502,37 @@
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Manager.get_task"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Manager.get_task">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskQueue.get_task"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.TaskQueue.get_task">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div>
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Manager.on_task_submitted"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Manager.on_task_submitted">[docs]</a>    <span class="k">def</span> <span class="nf">on_task_submitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskQueue.on_task_submitted"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.TaskQueue.on_task_submitted">[docs]</a>    <span class="k">def</span> <span class="nf">on_task_submitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Submitted task </span><span class="si">{0.task}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">))</span></div>
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Manager.on_task_sent"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Manager.on_task_sent">[docs]</a>    <span class="k">def</span> <span class="nf">on_task_sent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskQueue.on_task_sent"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.TaskQueue.on_task_sent">[docs]</a>    <span class="k">def</span> <span class="nf">on_task_sent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Task </span><span class="si">{0.task}</span><span class="s1"> sent to @</span><span class="si">{0.worker_id}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">))</span></div>
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Manager.on_result"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Manager.on_result">[docs]</a>    <span class="k">def</span> <span class="nf">on_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskQueue.on_result"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.TaskQueue.on_result">[docs]</a>    <span class="k">def</span> <span class="nf">on_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Result for task </span><span class="si">{0.task}</span><span class="s1"> from @</span><span class="si">{0.worker_id}</span><span class="se">\n</span><span class="si">{0.result}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_metadata</span><span class="p">))</span></div>
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Manager.on_timeout_error"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Manager.on_timeout_error">[docs]</a>    <span class="k">def</span> <span class="nf">on_timeout_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskQueue.on_timeout_error"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.TaskQueue.on_timeout_error">[docs]</a>    <span class="k">def</span> <span class="nf">on_timeout_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">):</span>
 
         <span class="k">pass</span></div>
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Manager.on_stream_error"><a class="viewcode-back" href="../../api/sidita/Manager.html#sidita.Manager.Manager.on_stream_error">[docs]</a>    <span class="k">def</span> <span class="nf">on_stream_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskQueue.on_stream_error"><a class="viewcode-back" href="../../api/sidita/TaskQueue.html#sidita.TaskQueue.TaskQueue.on_stream_error">[docs]</a>    <span class="k">def</span> <span class="nf">on_stream_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_metadata</span><span class="p">):</span>
 
         <span class="k">pass</span></div></div>
 </pre></div>

@@ -1,0 +1,114 @@
+.. include:: project-links.txt
+.. include:: abbreviation.txt
+
+.. _first-steps-page:
+
+=========================
+ First Steps with Sidita
+=========================
+
+.. code-block:: py3
+
+    import sidita.Logging
+    logger = sidita.Logging.setup_logging('sidita-worker')
+
+    import numpy as np
+    import logging
+    import random
+    import sys
+    import time
+
+    from sidita import Worker
+
+    class TestWorker(Worker):
+
+        _logger = logger.getChild('Worker')
+
+
+        def __init__(self, worker_id):
+            super().__init__(worker_id)
+
+
+        def on_task(self, task):
+
+            # simulate workload
+            # time.sleep(random.random()/1000)
+            # time.sleep(random.random()*10)
+
+            # simulate crash
+            # if random.random() < .1:
+            #     1/0
+
+            # simulate memory load
+            # self._pool.append(np.ones(1024*100))
+
+            return {
+                'status': 'completed',
+                'payload': task['payload'],
+            }
+
+.. code-block:: py3
+
+    import sidita.Logging
+    logger = sidita.Logging.setup_logging('sidita')
+
+    from datetime import timedelta
+    from pathlib import Path
+    import random
+    import unittest
+
+    from sidita import TaskQueue, TaskState
+
+    class MyTaskQueue(TaskQueue):
+
+        _logger = logger.getChild('MyTaskQueue')
+
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+
+        async def task_producer(self):
+
+            N = 10
+
+            for i in range(1, N + 1):
+                self._logger.info('Producing {}/{}'.format(i, N))
+                # simulate workload
+                # await asyncio.sleep(random.random())
+                task = {
+                    'action': 'run',
+                    'payload': 'message {}'.format(i),
+                }
+                await self.submit(task)
+
+            await self.send_stop()
+
+
+        def on_task_submitted(self, task_metadata):
+            super().on_task_submitted(task_metadata)
+
+        def on_task_sent(self, task_metadata):
+            super().on_task_sent(task_metadata)
+
+        def on_result(self, task_metadata):
+            super().on_result(task_metadata)
+
+        def on_timeout_error(self, task_metadata):
+            pass
+
+        def on_stream_error(self, task_metadata):
+            pass
+
+.. code-block:: py3
+
+    task_queue = MyTaskQueue(
+        python_path=Path(__file__).resolve().parent,
+        worker_module='TestWorker', # cannot define TestWorker in unit-test file
+        worker_cls='TestWorker',
+        max_queue_size=100,
+        max_memory=100*1024**2,
+        memory_check_interval=timedelta(seconds=5),
+        task_timeout=timedelta(seconds=1),
+    )
+    task_queue.run()

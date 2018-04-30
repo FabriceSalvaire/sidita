@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>8.1.9. worker &mdash; sidita 0.1.0 documentation</title>
+  <title>8.1.6. Units &mdash; sidita 0.1.0 documentation</title>
   
 
   
@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="9. Development &amp; Community" href="../../development.html" />
-    <link rel="prev" title="8.1.8. WorkerMetrics" href="WorkerMetrics.html" /> 
+    <link rel="next" title="8.1.7. Worker" href="Worker.html" />
+    <link rel="prev" title="8.1.5. TaskQueue" href="TaskQueue.html" /> 
 
   
   <script src="../../static/js/modernizr.min.js"></script>
@@ -123,10 +123,10 @@
 <li class="toctree-l3"><a class="reference internal" href="Statistics.html">8.1.3. Statistics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="TaskMetaData.html">8.1.4. TaskMetaData</a></li>
 <li class="toctree-l3"><a class="reference internal" href="TaskQueue.html">8.1.5. TaskQueue</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Units.html">8.1.6. Units</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">8.1.6. Units</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Worker.html">8.1.7. Worker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="WorkerMetrics.html">8.1.8. WorkerMetrics</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">8.1.9. worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="worker.html">8.1.9. worker</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference-manual.html#indexes">8.2. Indexes</a></li>
@@ -190,13 +190,13 @@
         
           <li><a href="../sidita.html">8.1. sidita</a> &raquo;</li>
         
-      <li>8.1.9. worker</li>
+      <li>8.1.6. Units</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/api/sidita/worker.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/api/sidita/Units.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -209,9 +209,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sidita.worker">
-<span id="worker"></span><h1>8.1.9. worker<a class="headerlink" href="#module-sidita.worker" title="Permalink to this headline">¶</a></h1>
-<p>Implements default main function for workers.</p>
+  <div class="section" id="module-sidita.Units">
+<span id="units"></span><h1>8.1.6. Units<a class="headerlink" href="#module-sidita.Units" title="Permalink to this headline">¶</a></h1>
+<p>Implements some units like duration and byte.</p>
+<p>See also <code class="xref py py-mod docutils literal notranslate"><span class="pre">datetime.timedelta</span></code> for duration.</p>
+<p>Example of usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">size</span> <span class="o">=</span> <span class="mi">10</span><span class="nd">@u_MB</span>
+
+<span class="n">size</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="mi">2</span> <span class="o">*</span> <span class="n">size</span>
+
+<span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+<span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="sidita.Units.to_MB">
+<code class="descclassname">sidita.Units.</code><code class="descname">to_MB</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Units.html#to_MB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Units.to_MB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="sidita.Units.Duration">
+<em class="property">class </em><code class="descclassname">sidita.Units.</code><code class="descname">Duration</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Units.html#Duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Units.Duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sidita.Units.FloatUnit</span></code></p>
+</dd></dl>
+
 </div>
 
 
@@ -222,10 +244,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../../development.html" class="btn btn-neutral float-right" title="9. Development &amp; Community" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="Worker.html" class="btn btn-neutral float-right" title="8.1.7. Worker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="WorkerMetrics.html" class="btn btn-neutral" title="8.1.8. WorkerMetrics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="TaskQueue.html" class="btn btn-neutral" title="8.1.5. TaskQueue" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>7.1.1. Manager &mdash; sidita 0.1.0 documentation</title>
+  <title>7.1.2. Manager &mdash; sidita 0.1.0 documentation</title>
   
 
   
@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="7.1.2. Message" href="Message.html" />
-    <link rel="prev" title="7.1. sidita" href="../sidita.html" /> 
+    <link rel="next" title="7.1.3. Message" href="Message.html" />
+    <link rel="prev" title="7.1.1. Logging" href="Logging.html" /> 
 
   
   <script src="../../static/js/modernizr.min.js"></script>
@@ -85,16 +85,16 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">1. Overview</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#what-is-sidita">1.1. What is sidita ?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#how-is-sidita-licensed">1.2. How is sidita licensed ?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#going-further-with-sidita">1.3. Going further with sidita</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#which-platforms-are-supported-by-sidita">1.4. Which platforms are supported by sidita ?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#how-to-install-sidita">1.5. How to install sidita ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#what-is-sidita">1.1. What is Sidita ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#how-is-sidita-licensed">1.2. How is Sidita licensed ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#going-further-with-sidita">1.3. Going further with Sidita</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#which-platforms-are-supported-by-sidita">1.4. Which platforms are supported by Sidita ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#how-to-install-sidita">1.5. How to install Sidita ?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#which-version-of-python-is-required">1.6. Which version of Python is required ?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../news.html">2. News</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../news.html#v0-2018-10-01">2.1. V0 2018-10-01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../news.html#v0-2018-05-01">2.1. V0 2018-05-01</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">3. Roadmap</a></li>
@@ -115,11 +115,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../design-notes.html">6. Design Notes</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../reference-manual.html">7. API Documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../sidita.html">7.1. sidita</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">7.1.1. Manager</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Message.html">7.1.2. Message</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Statistics.html">7.1.3. Statistics</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Worker.html">7.1.4. Worker</a></li>
-<li class="toctree-l3"><a class="reference internal" href="worker.html">7.1.5. worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Logging.html">7.1.1. Logging</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">7.1.2. Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Message.html">7.1.3. Message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Statistics.html">7.1.4. Statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TaskMetaData.html">7.1.5. TaskMetaData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Units.html">7.1.6. Units</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Worker.html">7.1.7. Worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WorkerMetrics.html">7.1.8. WorkerMetrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="worker.html">7.1.9. worker</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference-manual.html#indexes">7.2. Indexes</a></li>
@@ -183,7 +189,7 @@
         
           <li><a href="../sidita.html">7.1. sidita</a> &raquo;</li>
         
-      <li>7.1.1. Manager</li>
+      <li>7.1.2. Manager</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -203,29 +209,65 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-sidita.Manager">
-<span id="manager"></span><h1>7.1.1. Manager<a class="headerlink" href="#module-sidita.Manager" title="Permalink to this headline">¶</a></h1>
+<span id="manager"></span><h1>7.1.2. Manager<a class="headerlink" href="#module-sidita.Manager" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="sidita.Manager.Manager">
-<em class="property">class </em><code class="descclassname">sidita.Manager.</code><code class="descname">Manager</code><span class="sig-paren">(</span><em>worker_main=PosixPath('/home/fabrice/home/developpement/python/sidita/sidita/worker.py')</em>, <em>python_path=None</em>, <em>worker_module='sidita.Worker'</em>, <em>worker_cls='Worker'</em>, <em>number_of_workers=None</em>, <em>max_queue_size=0</em>, <em>max_memory=0</em>, <em>memory_check_interval=datetime.timedelta(0</em>, <em>60)</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#Manager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.Manager" title="Permalink to this definition">¶</a></dt>
+<dt id="sidita.Manager.Consumer">
+<em class="property">class </em><code class="descclassname">sidita.Manager.</code><code class="descname">Consumer</code><span class="sig-paren">(</span><em>worker_id</em>, <em>manager</em>, <em>worker_main=PosixPath('/home/fabrice/home/developpement/python/sidita/sidita/worker.py')</em>, <em>python_path=None</em>, <em>worker_module='sidita.Worker'</em>, <em>worker_cls='Worker'</em>, <em>max_memory=0</em>, <em>memory_check_interval=datetime.timedelta(0</em>, <em>60)</em>, <em>task_timeout=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#Consumer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.Consumer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="attribute">
-<dt id="sidita.Manager.Manager.DEFAULT_WORKER_CLASS">
-<code class="descname">DEFAULT_WORKER_CLASS</code><em class="property"> = 'Worker'</em><a class="headerlink" href="#sidita.Manager.Manager.DEFAULT_WORKER_CLASS" title="Permalink to this definition">¶</a></dt>
+<dt id="sidita.Manager.Consumer.DEFAULT_WORKER_CLASS">
+<code class="descname">DEFAULT_WORKER_CLASS</code><em class="property"> = 'Worker'</em><a class="headerlink" href="#sidita.Manager.Consumer.DEFAULT_WORKER_CLASS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="sidita.Manager.Manager.DEFAULT_WORKER_MAIN">
-<code class="descname">DEFAULT_WORKER_MAIN</code><em class="property"> = PosixPath('/home/fabrice/home/developpement/python/sidita/sidita/worker.py')</em><a class="headerlink" href="#sidita.Manager.Manager.DEFAULT_WORKER_MAIN" title="Permalink to this definition">¶</a></dt>
+<dt id="sidita.Manager.Consumer.DEFAULT_WORKER_MAIN">
+<code class="descname">DEFAULT_WORKER_MAIN</code><em class="property"> = PosixPath('/home/fabrice/home/developpement/python/sidita/sidita/worker.py')</em><a class="headerlink" href="#sidita.Manager.Consumer.DEFAULT_WORKER_MAIN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="sidita.Manager.Manager.DEFAULT_WORKER_MODULE">
-<code class="descname">DEFAULT_WORKER_MODULE</code><em class="property"> = 'sidita.Worker'</em><a class="headerlink" href="#sidita.Manager.Manager.DEFAULT_WORKER_MODULE" title="Permalink to this definition">¶</a></dt>
+<dt id="sidita.Manager.Consumer.DEFAULT_WORKER_MODULE">
+<code class="descname">DEFAULT_WORKER_MODULE</code><em class="property"> = 'sidita.Worker'</em><a class="headerlink" href="#sidita.Manager.Consumer.DEFAULT_WORKER_MODULE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sidita.Manager.Consumer.dead">
+<code class="descname">dead</code><a class="headerlink" href="#sidita.Manager.Consumer.dead" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sidita.Manager.Consumer.id">
+<code class="descname">id</code><a class="headerlink" href="#sidita.Manager.Consumer.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sidita.Manager.Consumer.metrics">
+<code class="descname">metrics</code><a class="headerlink" href="#sidita.Manager.Consumer.metrics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.Manager.Consumer.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#Consumer.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.Consumer.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sidita.Manager.Manager">
+<em class="property">class </em><code class="descclassname">sidita.Manager.</code><code class="descname">Manager</code><span class="sig-paren">(</span><em>number_of_workers=None</em>, <em>max_queue_size=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#Manager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.Manager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="sidita.Manager.Manager.get_task">
+<code class="descname">get_task</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#Manager.get_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.Manager.get_task" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="sidita.Manager.Manager.on_result">
 <code class="descname">on_result</code><span class="sig-paren">(</span><em>task_metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#Manager.on_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.Manager.on_result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.Manager.Manager.on_stream_error">
+<code class="descname">on_stream_error</code><span class="sig-paren">(</span><em>task_metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#Manager.on_stream_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.Manager.on_stream_error" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -236,6 +278,11 @@
 <dl class="method">
 <dt id="sidita.Manager.Manager.on_task_submitted">
 <code class="descname">on_task_submitted</code><span class="sig-paren">(</span><em>task_metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#Manager.on_task_submitted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.Manager.on_task_submitted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.Manager.Manager.on_timeout_error">
+<code class="descname">on_timeout_error</code><span class="sig-paren">(</span><em>task_metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#Manager.on_timeout_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.Manager.on_timeout_error" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -260,103 +307,6 @@
 
 </dd></dl>
 
-<dl class="class">
-<dt id="sidita.Manager.TaskMetaData">
-<em class="property">class </em><code class="descclassname">sidita.Manager.</code><code class="descname">TaskMetaData</code><span class="sig-paren">(</span><em>task</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#TaskMetaData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.TaskMetaData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<dl class="attribute">
-<dt id="sidita.Manager.TaskMetaData.LAST_TASK_ID">
-<code class="descname">LAST_TASK_ID</code><em class="property"> = -1</em><a class="headerlink" href="#sidita.Manager.TaskMetaData.LAST_TASK_ID" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Manager.TaskMetaData.result">
-<code class="descname">result</code><a class="headerlink" href="#sidita.Manager.TaskMetaData.result" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Manager.TaskMetaData.result_date">
-<code class="descname">result_date</code><a class="headerlink" href="#sidita.Manager.TaskMetaData.result_date" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Manager.TaskMetaData.sent_date">
-<code class="descname">sent_date</code><a class="headerlink" href="#sidita.Manager.TaskMetaData.sent_date" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="sidita.Manager.TaskMetaData.submit">
-<code class="descname">submit</code><span class="sig-paren">(</span><em>worker_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#TaskMetaData.submit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.TaskMetaData.submit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Manager.TaskMetaData.submitted_date">
-<code class="descname">submitted_date</code><a class="headerlink" href="#sidita.Manager.TaskMetaData.submitted_date" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Manager.TaskMetaData.task">
-<code class="descname">task</code><a class="headerlink" href="#sidita.Manager.TaskMetaData.task" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Manager.TaskMetaData.task_id">
-<code class="descname">task_id</code><a class="headerlink" href="#sidita.Manager.TaskMetaData.task_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Manager.TaskMetaData.task_time">
-<code class="descname">task_time</code><a class="headerlink" href="#sidita.Manager.TaskMetaData.task_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Manager.TaskMetaData.task_time_s">
-<code class="descname">task_time_s</code><a class="headerlink" href="#sidita.Manager.TaskMetaData.task_time_s" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Manager.TaskMetaData.worker_id">
-<code class="descname">worker_id</code><a class="headerlink" href="#sidita.Manager.TaskMetaData.worker_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="sidita.Manager.WorkerMetrics">
-<em class="property">class </em><code class="descclassname">sidita.Manager.</code><code class="descname">WorkerMetrics</code><span class="sig-paren">(</span><em>number_of_workers=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#WorkerMetrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.WorkerMetrics" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<dl class="method">
-<dt id="sidita.Manager.WorkerMetrics.add_crash">
-<code class="descname">add_crash</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#WorkerMetrics.add_crash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.WorkerMetrics.add_crash" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="sidita.Manager.WorkerMetrics.add_memory">
-<code class="descname">add_memory</code><span class="sig-paren">(</span><em>worker_id</em>, <em>memory</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#WorkerMetrics.add_memory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.WorkerMetrics.add_memory" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="sidita.Manager.WorkerMetrics.add_restart">
-<code class="descname">add_restart</code><span class="sig-paren">(</span><em>worker_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#WorkerMetrics.add_restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.WorkerMetrics.add_restart" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="sidita.Manager.WorkerMetrics.add_task_time">
-<code class="descname">add_task_time</code><span class="sig-paren">(</span><em>worker_id</em>, <em>task_time</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#WorkerMetrics.add_task_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.WorkerMetrics.add_task_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="sidita.Manager.WorkerMetrics.dump_statistics">
-<code class="descname">dump_statistics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#WorkerMetrics.dump_statistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.WorkerMetrics.dump_statistics" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="sidita.Manager.to_MB">
-<code class="descclassname">sidita.Manager.</code><code class="descname">to_MB</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Manager.html#to_MB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Manager.to_MB" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </div>
 
 
@@ -367,10 +317,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="Message.html" class="btn btn-neutral float-right" title="7.1.2. Message" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="Message.html" class="btn btn-neutral float-right" title="7.1.3. Message" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../sidita.html" class="btn btn-neutral" title="7.1. sidita" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="Logging.html" class="btn btn-neutral" title="7.1.1. Logging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

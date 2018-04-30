@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>8.1.9. worker &mdash; sidita 0.1.0 documentation</title>
+  <title>sidita.Logging &mdash; sidita 0.1.0 documentation</title>
   
 
   
@@ -28,9 +28,7 @@
     <link rel="stylesheet" href="../../static/css/sidita.css" type="text/css" />
   <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="9. Development &amp; Community" href="../../development.html" />
-    <link rel="prev" title="8.1.8. WorkerMetrics" href="WorkerMetrics.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
 
   
   <script src="../../static/js/modernizr.min.js"></script>
@@ -83,7 +81,7 @@
               
             
             
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">1. Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#what-is-sidita">1.1. What is Sidita ?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#how-is-sidita-licensed">1.2. How is Sidita licensed ?</a></li>
@@ -114,19 +112,19 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../design-notes.html">6. Design Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../first-steps.html">7. First Steps with Sidita</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../reference-manual.html">8. API Documentation</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../sidita.html">8.1. sidita</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="Logging.html">8.1.1. Logging</a><ul class="simple">
+<li class="toctree-l1"><a class="reference internal" href="../../reference-manual.html">8. API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/sidita.html">8.1. sidita</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/sidita/Logging.html">8.1.1. Logging</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="Message.html">8.1.2. Message</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Statistics.html">8.1.3. Statistics</a></li>
-<li class="toctree-l3"><a class="reference internal" href="TaskMetaData.html">8.1.4. TaskMetaData</a></li>
-<li class="toctree-l3"><a class="reference internal" href="TaskQueue.html">8.1.5. TaskQueue</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Units.html">8.1.6. Units</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Worker.html">8.1.7. Worker</a></li>
-<li class="toctree-l3"><a class="reference internal" href="WorkerMetrics.html">8.1.8. WorkerMetrics</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">8.1.9. worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/sidita/Message.html">8.1.2. Message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/sidita/Statistics.html">8.1.3. Statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/sidita/TaskMetaData.html">8.1.4. TaskMetaData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/sidita/TaskQueue.html">8.1.5. TaskQueue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/sidita/Units.html">8.1.6. Units</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/sidita/Worker.html">8.1.7. Worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/sidita/WorkerMetrics.html">8.1.8. WorkerMetrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/sidita/worker.html">8.1.9. worker</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference-manual.html#indexes">8.2. Indexes</a></li>
@@ -186,18 +184,12 @@
     
       <li><a href="../../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="../../reference-manual.html">8. API Documentation</a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../sidita.html">8.1. sidita</a> &raquo;</li>
-        
-      <li>8.1.9. worker</li>
+      <li>sidita.Logging</li>
     
     
       <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="../../_sources/api/sidita/worker.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -209,25 +201,60 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sidita.worker">
-<span id="worker"></span><h1>8.1.9. worker<a class="headerlink" href="#module-sidita.worker" title="Permalink to this headline">¶</a></h1>
-<p>Implements default main function for workers.</p>
-</div>
+  <h1>Source code for sidita.Logging</h1><div class="highlight"><pre>
+<span></span><span class="c1">####################################################################################################</span>
+<span class="c1">#</span>
+<span class="c1"># sidita - Simple Distributed Task Queue</span>
+<span class="c1"># Copyright (C) 2018 Fabrice Salvaire</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="c1">####################################################################################################</span>
 
+<span class="sd">&quot;&quot;&quot;Implements logging setup.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1">####################################################################################################</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
+
+<span class="c1">####################################################################################################</span>
+
+<div class="viewcode-block" id="setup_logging"><a class="viewcode-back" href="../../api/sidita/Logging.html#sidita.Logging.setup_logging">[docs]</a><span class="k">def</span> <span class="nf">setup_logging</span><span class="p">(</span><span class="n">application_name</span><span class="p">,</span>
+                  <span class="n">config_file</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;logging.yml&#39;</span><span class="p">)):</span>
+
+    <span class="n">logging_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">))</span>
+
+    <span class="c1"># Fixme: \033 is not interpreted in YAML</span>
+    <span class="n">formatter_config</span> <span class="o">=</span> <span class="n">logging_config</span><span class="p">[</span><span class="s1">&#39;formatters&#39;</span><span class="p">][</span><span class="s1">&#39;ansi&#39;</span><span class="p">][</span><span class="s1">&#39;format&#39;</span><span class="p">]</span>
+    <span class="n">logging_config</span><span class="p">[</span><span class="s1">&#39;formatters&#39;</span><span class="p">][</span><span class="s1">&#39;ansi&#39;</span><span class="p">][</span><span class="s1">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatter_config</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;ESC&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">logging_config</span><span class="p">)</span>
+
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">application_name</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">application_name</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">logger</span></div>
+</pre></div>
 
            </div>
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../../development.html" class="btn btn-neutral float-right" title="9. Development &amp; Community" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="WorkerMetrics.html" class="btn btn-neutral" title="8.1.8. WorkerMetrics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

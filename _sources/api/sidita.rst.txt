@@ -4,10 +4,14 @@
 ========
 
 .. toctree::
-    sidita/Manager
+    sidita/Logging
     sidita/Message
     sidita/Statistics
+    sidita/TaskMetaData
+    sidita/TaskQueue
+    sidita/Units
     sidita/Worker
+    sidita/WorkerMetrics
     sidita/worker
 
 .. automodule:: sidita

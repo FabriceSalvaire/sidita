@@ -1,0 +1,8 @@
+
+===============
+ WorkerMetrics
+===============
+
+.. automodule:: sidita.WorkerMetrics
+   :members:
+   :show-inheritance:

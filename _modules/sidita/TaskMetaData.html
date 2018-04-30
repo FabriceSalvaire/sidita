@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>sidita.Worker &mdash; sidita 0.1.0 documentation</title>
+  <title>sidita.TaskMetaData &mdash; sidita 0.1.0 documentation</title>
   
 
   
@@ -186,7 +186,7 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-      <li>sidita.Worker</li>
+      <li>sidita.TaskMetaData</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -201,7 +201,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for sidita.Worker</h1><div class="highlight"><pre>
+  <h1>Source code for sidita.TaskMetaData</h1><div class="highlight"><pre>
 <span></span><span class="c1">####################################################################################################</span>
 <span class="c1">#</span>
 <span class="c1"># sidita - Simple Distributed Task Queue</span>
@@ -222,57 +222,133 @@
 <span class="c1">#</span>
 <span class="c1">####################################################################################################</span>
 
-<span class="sd">&quot;&quot;&quot;Implements default worker.</span>
+<span class="sd">&quot;&quot;&quot;Implements a class to store task metadata.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1">####################################################################################################</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">time</span>
-
-<span class="kn">from</span> <span class="nn">.Message</span> <span class="k">import</span> <span class="n">StandardMessageStream</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;TaskMetaData&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;TaskState&#39;</span><span class="p">,</span>
+<span class="p">]</span>
 
 <span class="c1">####################################################################################################</span>
 
-<span class="n">_module_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
 
 <span class="c1">####################################################################################################</span>
 
-<div class="viewcode-block" id="Worker"><a class="viewcode-back" href="../../api/sidita/Worker.html#sidita.Worker.Worker">[docs]</a><span class="k">class</span> <span class="nc">Worker</span><span class="p">:</span>
+<div class="viewcode-block" id="TaskState"><a class="viewcode-back" href="../../api/sidita/TaskMetaData.html#sidita.TaskMetaData.TaskState">[docs]</a><span class="k">class</span> <span class="nc">TaskState</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
 
-    <span class="n">_logger</span> <span class="o">=</span> <span class="n">_module_logger</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;Worker&#39;</span><span class="p">)</span> <span class="c1"># Fixme: must write to stderr</span>
+    <span class="n">SUBMITTED</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">DISPATCHED</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">READY</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">TIMEOUT</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">CRASHED</span> <span class="o">=</span> <span class="mi">4</span></div>
+
+<span class="c1">####################################################################################################</span>
+
+<div class="viewcode-block" id="TaskMetaData"><a class="viewcode-back" href="../../api/sidita/TaskMetaData.html#sidita.TaskMetaData.TaskMetaData">[docs]</a><span class="k">class</span> <span class="nc">TaskMetaData</span><span class="p">:</span>
+
+    <span class="n">__LAST_TASK_ID__</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
     <span class="c1">##############################################</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_id</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskMetaData.new_tak_id"><a class="viewcode-back" href="../../api/sidita/TaskMetaData.html#sidita.TaskMetaData.TaskMetaData.new_tak_id">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">new_tak_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">__LAST_TASK_ID__</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__LAST_TASK_ID__</span></div>
+
+    <span class="c1">##############################################</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_task</span> <span class="o">=</span> <span class="n">task</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_tak_id</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">TaskState</span><span class="o">.</span><span class="n">SUBMITTED</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_result</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_woker_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_submitted_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_date</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_result_date</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1">##############################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">worker_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_worker_id</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">submitted_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_submitted_date</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dispatch_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_submitted_date</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">result_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_submitted_date</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">task_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_date</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_date</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">task_time_s</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_date</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_date</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+    <span class="c1">##############################################</span>
+
+<div class="viewcode-block" id="TaskMetaData.dispatch"><a class="viewcode-back" href="../../api/sidita/TaskMetaData.html#sidita.TaskMetaData.TaskMetaData.dispatch">[docs]</a>    <span class="k">def</span> <span class="nf">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_id</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_worker_id</span> <span class="o">=</span> <span class="n">worker_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">TaskState</span><span class="o">.</span><span class="n">DISPATCHED</span></div>
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Worker.run"><a class="viewcode-back" href="../../api/sidita/Worker.html#sidita.Worker.Worker.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_set_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start Worker @</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_worker_id</span><span class="p">))</span>
-
-        <span class="n">message_stream</span> <span class="o">=</span> <span class="n">StandardMessageStream</span><span class="p">(</span>
-            <span class="n">input_stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">,</span>
-            <span class="n">output_stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">task</span> <span class="o">=</span> <span class="n">message_stream</span><span class="o">.</span><span class="n">receive</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Worker @</span><span class="si">{}</span><span class="s1"> received </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_worker_id</span><span class="p">,</span> <span class="n">task</span><span class="p">))</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_task</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
-            <span class="n">message_stream</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_result</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_result_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Worker.on_task"><a class="viewcode-back" href="../../api/sidita/Worker.html#sidita.Worker.Worker.on_task">[docs]</a>    <span class="k">def</span> <span class="nf">on_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">task</span></div></div>
+    <span class="nd">@result</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_result</span><span class="p">(</span><span class="n">TaskState</span><span class="o">.</span><span class="n">READY</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="c1">##############################################</span>
+
+<div class="viewcode-block" id="TaskMetaData.set_timeout"><a class="viewcode-back" href="../../api/sidita/TaskMetaData.html#sidita.TaskMetaData.TaskMetaData.set_timeout">[docs]</a>    <span class="k">def</span> <span class="nf">set_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_result</span><span class="p">(</span><span class="n">TaskState</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">)</span></div>
+
+    <span class="c1">##############################################</span>
+
+<div class="viewcode-block" id="TaskMetaData.set_crashed"><a class="viewcode-back" href="../../api/sidita/TaskMetaData.html#sidita.TaskMetaData.TaskMetaData.set_crashed">[docs]</a>    <span class="k">def</span> <span class="nf">set_crashed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_result</span><span class="p">(</span><span class="n">TaskState</span><span class="o">.</span><span class="n">CRASHED</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

@@ -1,0 +1,8 @@
+
+==============
+ TaskMetaData
+==============
+
+.. automodule:: sidita.TaskMetaData
+   :members:
+   :show-inheritance:

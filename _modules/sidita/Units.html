@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>sidita.Worker &mdash; sidita 0.1.0 documentation</title>
+  <title>sidita.Units &mdash; sidita 0.1.0 documentation</title>
   
 
   
@@ -186,7 +186,7 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-      <li>sidita.Worker</li>
+      <li>sidita.Units</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -201,7 +201,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for sidita.Worker</h1><div class="highlight"><pre>
+  <h1>Source code for sidita.Units</h1><div class="highlight"><pre>
 <span></span><span class="c1">####################################################################################################</span>
 <span class="c1">#</span>
 <span class="c1"># sidita - Simple Distributed Task Queue</span>
@@ -222,57 +222,134 @@
 <span class="c1">#</span>
 <span class="c1">####################################################################################################</span>
 
-<span class="sd">&quot;&quot;&quot;Implements default worker.</span>
+<span class="sd">&quot;&quot;&quot;Implements some units like duration and byte.</span>
+
+<span class="sd">See also :mod:`datetime.timedelta` for duration.</span>
+
+<span class="sd">Example of usage::</span>
+
+<span class="sd">    size = 10@u_MB</span>
+
+<span class="sd">    size * 2</span>
+<span class="sd">    2 * size</span>
+
+<span class="sd">    int(size)</span>
+<span class="sd">    str(size)</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1">####################################################################################################</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;u_Byte&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;u_kB&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;u_MB&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;u_GB&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;u_TB&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;u_PB&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;to_MB&#39;</span><span class="p">,</span>
 
-<span class="kn">from</span> <span class="nn">.Message</span> <span class="k">import</span> <span class="n">StandardMessageStream</span>
+    <span class="s1">&#39;Duration&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;u_s&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;u_min&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;u_hour&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;u_day&#39;</span><span class="p">,</span>
+<span class="p">]</span>
 
 <span class="c1">####################################################################################################</span>
 
-<span class="n">_module_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">IntUnit</span><span class="p">:</span>
+
+    <span class="c1">##############################################</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="c1">##############################################</span>
+
+    <span class="k">def</span> <span class="nf">__int__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+
+    <span class="c1">##############################################</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+
+    <span class="c1">##############################################</span>
+
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">other</span><span class="p">))</span>
+
+    <span class="c1">##############################################</span>
+
+    <span class="k">def</span> <span class="nf">__rmatmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="c1">##############################################</span>
+
+    <span class="k">def</span> <span class="nf">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">*=</span> <span class="nb">int</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="c1">##############################################</span>
+
+    <span class="k">def</span> <span class="nf">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="c1">##############################################</span>
+
+    <span class="k">def</span> <span class="nf">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">/</span> <span class="nb">int</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
 <span class="c1">####################################################################################################</span>
 
-<div class="viewcode-block" id="Worker"><a class="viewcode-back" href="../../api/sidita/Worker.html#sidita.Worker.Worker">[docs]</a><span class="k">class</span> <span class="nc">Worker</span><span class="p">:</span>
-
-    <span class="n">_logger</span> <span class="o">=</span> <span class="n">_module_logger</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;Worker&#39;</span><span class="p">)</span> <span class="c1"># Fixme: must write to stderr</span>
+<span class="k">class</span> <span class="nc">FloatUnit</span><span class="p">(</span><span class="n">IntUnit</span><span class="p">):</span>
 
     <span class="c1">##############################################</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_id</span><span class="p">):</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_worker_id</span> <span class="o">=</span> <span class="n">worker_id</span>
-
-    <span class="c1">##############################################</span>
-
-<div class="viewcode-block" id="Worker.run"><a class="viewcode-back" href="../../api/sidita/Worker.html#sidita.Worker.Worker.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start Worker @</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_worker_id</span><span class="p">))</span>
-
-        <span class="n">message_stream</span> <span class="o">=</span> <span class="n">StandardMessageStream</span><span class="p">(</span>
-            <span class="n">input_stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">,</span>
-            <span class="n">output_stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">task</span> <span class="o">=</span> <span class="n">message_stream</span><span class="o">.</span><span class="n">receive</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Worker @</span><span class="si">{}</span><span class="s1"> received </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_worker_id</span><span class="p">,</span> <span class="n">task</span><span class="p">))</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_task</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
-            <span class="n">message_stream</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">__float__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
 
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="Worker.on_task"><a class="viewcode-back" href="../../api/sidita/Worker.html#sidita.Worker.Worker.on_task">[docs]</a>    <span class="k">def</span> <span class="nf">on_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">task</span></div></div>
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">other</span><span class="p">))</span>
+
+    <span class="c1">##############################################</span>
+
+    <span class="k">def</span> <span class="nf">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">*=</span> <span class="nb">float</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="c1">##############################################</span>
+
+    <span class="k">def</span> <span class="nf">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+<span class="c1">####################################################################################################</span>
+
+<span class="k">class</span> <span class="nc">ByteSize</span><span class="p">(</span><span class="n">IntUnit</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="n">u_Byte</span> <span class="o">=</span> <span class="n">ByteSize</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">u_kB</span> <span class="o">=</span> <span class="n">u_Byte</span> <span class="o">*</span> <span class="mi">1024</span>
+<span class="n">u_MB</span> <span class="o">=</span> <span class="n">u_kB</span> <span class="o">*</span> <span class="mi">1024</span>
+<span class="n">u_GB</span> <span class="o">=</span> <span class="n">u_MB</span> <span class="o">*</span> <span class="mi">1024</span>
+<span class="n">u_TB</span> <span class="o">=</span> <span class="n">u_GB</span> <span class="o">*</span> <span class="mi">1024</span>
+<span class="n">u_PB</span> <span class="o">=</span> <span class="n">u_TB</span> <span class="o">*</span> <span class="mi">1024</span>
+
+<div class="viewcode-block" id="to_MB"><a class="viewcode-back" href="../../api/sidita/Units.html#sidita.Units.to_MB">[docs]</a><span class="k">def</span> <span class="nf">to_MB</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ByteSize</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">u_MB</span></div>
+
+<span class="c1">####################################################################################################</span>
+
+<div class="viewcode-block" id="Duration"><a class="viewcode-back" href="../../api/sidita/Units.html#sidita.Units.Duration">[docs]</a><span class="k">class</span> <span class="nc">Duration</span><span class="p">(</span><span class="n">FloatUnit</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+<span class="n">u_s</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">u_min</span> <span class="o">=</span> <span class="n">u_s</span> <span class="o">*</span> <span class="mi">60</span>
+<span class="n">u_hour</span> <span class="o">=</span> <span class="n">u_min</span> <span class="o">*</span> <span class="mi">60</span>
+<span class="n">u_day</span> <span class="o">=</span> <span class="n">u_hour</span> <span class="o">*</span> <span class="mi">24</span>
 </pre></div>
 
            </div>

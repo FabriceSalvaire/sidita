@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>7.1.4. Worker &mdash; sidita 0.1.0 documentation</title>
+  <title>8.1.7. Worker &mdash; sidita 0.1.0 documentation</title>
   
 
   
@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="7.1.5. worker" href="worker.html" />
-    <link rel="prev" title="7.1.3. Statistics" href="Statistics.html" /> 
+    <link rel="next" title="8.1.8. WorkerMetrics" href="WorkerMetrics.html" />
+    <link rel="prev" title="8.1.6. Units" href="Units.html" /> 
 
   
   <script src="../../static/js/modernizr.min.js"></script>
@@ -85,16 +85,16 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">1. Overview</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#what-is-sidita">1.1. What is sidita ?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#how-is-sidita-licensed">1.2. How is sidita licensed ?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#going-further-with-sidita">1.3. Going further with sidita</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#which-platforms-are-supported-by-sidita">1.4. Which platforms are supported by sidita ?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#how-to-install-sidita">1.5. How to install sidita ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#what-is-sidita">1.1. What is Sidita ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#how-is-sidita-licensed">1.2. How is Sidita licensed ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#going-further-with-sidita">1.3. Going further with Sidita</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#which-platforms-are-supported-by-sidita">1.4. Which platforms are supported by Sidita ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#how-to-install-sidita">1.5. How to install Sidita ?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#which-version-of-python-is-required">1.6. Which version of Python is required ?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../news.html">2. News</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../news.html#v0-2018-10-01">2.1. V0 2018-10-01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../news.html#v0-2018-05-01">2.1. V0 2018-05-01</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">3. Roadmap</a></li>
@@ -113,27 +113,34 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../design-notes.html">6. Design Notes</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../reference-manual.html">7. API Documentation</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../sidita.html">7.1. sidita</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="Manager.html">7.1.1. Manager</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Message.html">7.1.2. Message</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Statistics.html">7.1.3. Statistics</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">7.1.4. Worker</a></li>
-<li class="toctree-l3"><a class="reference internal" href="worker.html">7.1.5. worker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../first-steps.html">7. First Steps with Sidita</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../reference-manual.html">8. API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../sidita.html">8.1. sidita</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Logging.html">8.1.1. Logging</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../reference-manual.html#indexes">7.2. Indexes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Message.html">8.1.2. Message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Statistics.html">8.1.3. Statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TaskMetaData.html">8.1.4. TaskMetaData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TaskQueue.html">8.1.5. TaskQueue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Units.html">8.1.6. Units</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">8.1.7. Worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WorkerMetrics.html">8.1.8. WorkerMetrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="worker.html">8.1.9. worker</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../development.html">8. Development &amp; Community</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../development.html#how-you-can-help">8.1. How you can help ?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../development.html#contributors">8.2. Contributors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference-manual.html#indexes">8.2. Indexes</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../how-to-refer.html">9. How to Refer to sidita ?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../donate.html">10. How to Help Further ?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../related-projects.html">11. Related Projects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">12. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development.html">9. Development &amp; Community</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../development.html#how-you-can-help">9.1. How you can help ?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../development.html#contributors">9.2. Contributors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../how-to-refer.html">10. How to Refer to sidita ?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../donate.html">11. How to Help Further ?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../related-projects.html">12. Related Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">13. Bibliography</a></li>
 </ul>
 
             
@@ -179,11 +186,11 @@
     
       <li><a href="../../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="../../reference-manual.html">7. API Documentation</a> &raquo;</li>
+          <li><a href="../../reference-manual.html">8. API Documentation</a> &raquo;</li>
         
-          <li><a href="../sidita.html">7.1. sidita</a> &raquo;</li>
+          <li><a href="../sidita.html">8.1. sidita</a> &raquo;</li>
         
-      <li>7.1.4. Worker</li>
+      <li>8.1.7. Worker</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -203,11 +210,17 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-sidita.Worker">
-<span id="worker"></span><h1>7.1.4. Worker<a class="headerlink" href="#module-sidita.Worker" title="Permalink to this headline">¶</a></h1>
+<span id="worker"></span><h1>8.1.7. Worker<a class="headerlink" href="#module-sidita.Worker" title="Permalink to this headline">¶</a></h1>
+<p>Implements default worker.</p>
 <dl class="class">
 <dt id="sidita.Worker.Worker">
 <em class="property">class </em><code class="descclassname">sidita.Worker.</code><code class="descname">Worker</code><span class="sig-paren">(</span><em>worker_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Worker.html#Worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Worker.Worker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="sidita.Worker.Worker.on_task">
+<code class="descname">on_task</code><span class="sig-paren">(</span><em>task</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Worker.html#Worker.on_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Worker.Worker.on_task" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="sidita.Worker.Worker.run">
 <code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Worker.html#Worker.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Worker.Worker.run" title="Permalink to this definition">¶</a></dt>
@@ -225,10 +238,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="worker.html" class="btn btn-neutral float-right" title="7.1.5. worker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="WorkerMetrics.html" class="btn btn-neutral float-right" title="8.1.8. WorkerMetrics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="Statistics.html" class="btn btn-neutral" title="7.1.3. Statistics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="Units.html" class="btn btn-neutral" title="8.1.6. Units" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

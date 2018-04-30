@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>8.1.9. worker &mdash; sidita 0.1.0 documentation</title>
+  <title>8.1.1. Logging &mdash; sidita 0.1.0 documentation</title>
   
 
   
@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="9. Development &amp; Community" href="../../development.html" />
-    <link rel="prev" title="8.1.8. WorkerMetrics" href="WorkerMetrics.html" /> 
+    <link rel="next" title="8.1.2. Message" href="Message.html" />
+    <link rel="prev" title="8.1. sidita" href="../sidita.html" /> 
 
   
   <script src="../../static/js/modernizr.min.js"></script>
@@ -116,7 +116,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../first-steps.html">7. First Steps with Sidita</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../reference-manual.html">8. API Documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../sidita.html">8.1. sidita</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="Logging.html">8.1.1. Logging</a><ul class="simple">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">8.1.1. Logging</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="Message.html">8.1.2. Message</a></li>
@@ -126,7 +126,7 @@
 <li class="toctree-l3"><a class="reference internal" href="Units.html">8.1.6. Units</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Worker.html">8.1.7. Worker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="WorkerMetrics.html">8.1.8. WorkerMetrics</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">8.1.9. worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="worker.html">8.1.9. worker</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference-manual.html#indexes">8.2. Indexes</a></li>
@@ -190,13 +190,13 @@
         
           <li><a href="../sidita.html">8.1. sidita</a> &raquo;</li>
         
-      <li>8.1.9. worker</li>
+      <li>8.1.1. Logging</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/api/sidita/worker.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/api/sidita/Logging.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -209,9 +209,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sidita.worker">
-<span id="worker"></span><h1>8.1.9. worker<a class="headerlink" href="#module-sidita.worker" title="Permalink to this headline">¶</a></h1>
-<p>Implements default main function for workers.</p>
+  <div class="section" id="logging">
+<h1>8.1.1. Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-sidita.Logging"></span><p>Implements logging setup.</p>
+<dl class="function">
+<dt id="sidita.Logging.setup_logging">
+<code class="descclassname">sidita.Logging.</code><code class="descname">setup_logging</code><span class="sig-paren">(</span><em>application_name</em>, <em>config_file=PosixPath('/home/fabrice/home/developpement/python/sidita/sidita/Logging/logging.yml')</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Logging.html#setup_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Logging.setup_logging" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -222,10 +229,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../../development.html" class="btn btn-neutral float-right" title="9. Development &amp; Community" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="Message.html" class="btn btn-neutral float-right" title="8.1.2. Message" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="WorkerMetrics.html" class="btn btn-neutral" title="8.1.8. WorkerMetrics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../sidita.html" class="btn btn-neutral" title="8.1. sidita" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

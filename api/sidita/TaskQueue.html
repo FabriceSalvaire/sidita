@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>8.1.3. Statistics &mdash; sidita 0.1.0 documentation</title>
+  <title>8.1.5. TaskQueue &mdash; sidita 0.1.0 documentation</title>
   
 
   
@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="8.1.4. TaskMetaData" href="TaskMetaData.html" />
-    <link rel="prev" title="8.1.2. Message" href="Message.html" /> 
+    <link rel="next" title="8.1.6. Units" href="Units.html" />
+    <link rel="prev" title="8.1.4. TaskMetaData" href="TaskMetaData.html" /> 
 
   
   <script src="../../static/js/modernizr.min.js"></script>
@@ -120,9 +120,9 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="Message.html">8.1.2. Message</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">8.1.3. Statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Statistics.html">8.1.3. Statistics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="TaskMetaData.html">8.1.4. TaskMetaData</a></li>
-<li class="toctree-l3"><a class="reference internal" href="TaskQueue.html">8.1.5. TaskQueue</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">8.1.5. TaskQueue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Units.html">8.1.6. Units</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Worker.html">8.1.7. Worker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="WorkerMetrics.html">8.1.8. WorkerMetrics</a></li>
@@ -190,13 +190,13 @@
         
           <li><a href="../sidita.html">8.1. sidita</a> &raquo;</li>
         
-      <li>8.1.3. Statistics</li>
+      <li>8.1.5. TaskQueue</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/api/sidita/Statistics.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/api/sidita/TaskQueue.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -209,92 +209,102 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sidita.Statistics">
-<span id="statistics"></span><h1>8.1.3. Statistics<a class="headerlink" href="#module-sidita.Statistics" title="Permalink to this headline">¶</a></h1>
-<p>Implements statistical functions.</p>
+  <div class="section" id="module-sidita.TaskQueue">
+<span id="taskqueue"></span><h1>8.1.5. TaskQueue<a class="headerlink" href="#module-sidita.TaskQueue" title="Permalink to this headline">¶</a></h1>
+<p>Implement a Task Queue using an asyncio event loop and queue.</p>
 <dl class="class">
-<dt id="sidita.Statistics.DataSetMoment">
-<em class="property">class </em><code class="descclassname">sidita.Statistics.</code><code class="descname">DataSetMoment</code><span class="sig-paren">(</span><em>number_of_entries=0</em>, <em>sum_x=0</em>, <em>sum_x2=0</em>, <em>sum_x3=0</em>, <em>sum_x4=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Statistics.html#DataSetMoment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Statistics.DataSetMoment" title="Permalink to this definition">¶</a></dt>
+<dt id="sidita.TaskQueue.Consumer">
+<em class="property">class </em><code class="descclassname">sidita.TaskQueue.</code><code class="descname">Consumer</code><span class="sig-paren">(</span><em>worker_id</em>, <em>task_queue</em>, <em>worker_main=PosixPath('/home/fabrice/home/developpement/python/sidita/sidita/worker.py')</em>, <em>python_path=None</em>, <em>worker_module='sidita.Worker'</em>, <em>worker_cls='Worker'</em>, <em>max_memory=0</em>, <em>memory_check_interval=datetime.timedelta(0</em>, <em>60)</em>, <em>task_timeout=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#Consumer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.Consumer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="attribute">
-<dt id="sidita.Statistics.DataSetMoment.biased_standard_deviation">
-<code class="descname">biased_standard_deviation</code><a class="headerlink" href="#sidita.Statistics.DataSetMoment.biased_standard_deviation" title="Permalink to this definition">¶</a></dt>
+<dt id="sidita.TaskQueue.Consumer.DEFAULT_WORKER_CLASS">
+<code class="descname">DEFAULT_WORKER_CLASS</code><em class="property"> = 'Worker'</em><a class="headerlink" href="#sidita.TaskQueue.Consumer.DEFAULT_WORKER_CLASS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="sidita.Statistics.DataSetMoment.biased_variance">
-<code class="descname">biased_variance</code><a class="headerlink" href="#sidita.Statistics.DataSetMoment.biased_variance" title="Permalink to this definition">¶</a></dt>
+<dt id="sidita.TaskQueue.Consumer.DEFAULT_WORKER_MAIN">
+<code class="descname">DEFAULT_WORKER_MAIN</code><em class="property"> = PosixPath('/home/fabrice/home/developpement/python/sidita/sidita/worker.py')</em><a class="headerlink" href="#sidita.TaskQueue.Consumer.DEFAULT_WORKER_MAIN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sidita.TaskQueue.Consumer.DEFAULT_WORKER_MODULE">
+<code class="descname">DEFAULT_WORKER_MODULE</code><em class="property"> = 'sidita.Worker'</em><a class="headerlink" href="#sidita.TaskQueue.Consumer.DEFAULT_WORKER_MODULE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sidita.TaskQueue.Consumer.dead">
+<code class="descname">dead</code><a class="headerlink" href="#sidita.TaskQueue.Consumer.dead" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sidita.TaskQueue.Consumer.id">
+<code class="descname">id</code><a class="headerlink" href="#sidita.TaskQueue.Consumer.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sidita.TaskQueue.Consumer.metrics">
+<code class="descname">metrics</code><a class="headerlink" href="#sidita.TaskQueue.Consumer.metrics" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="sidita.Statistics.DataSetMoment.clone">
-<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Statistics.html#DataSetMoment.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Statistics.DataSetMoment.clone" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="sidita.Statistics.DataSetMoment.fill">
-<code class="descname">fill</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Statistics.html#DataSetMoment.fill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Statistics.DataSetMoment.fill" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="sidita.Statistics.DataSetMoment.from_json">
-<em class="property">static </em><code class="descname">from_json</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Statistics.html#DataSetMoment.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Statistics.DataSetMoment.from_json" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Statistics.DataSetMoment.kurtosis">
-<code class="descname">kurtosis</code><a class="headerlink" href="#sidita.Statistics.DataSetMoment.kurtosis" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Statistics.DataSetMoment.mean">
-<code class="descname">mean</code><a class="headerlink" href="#sidita.Statistics.DataSetMoment.mean" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Statistics.DataSetMoment.number_of_entries">
-<code class="descname">number_of_entries</code><a class="headerlink" href="#sidita.Statistics.DataSetMoment.number_of_entries" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Statistics.DataSetMoment.skew">
-<code class="descname">skew</code><a class="headerlink" href="#sidita.Statistics.DataSetMoment.skew" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Statistics.DataSetMoment.standard_deviation">
-<code class="descname">standard_deviation</code><a class="headerlink" href="#sidita.Statistics.DataSetMoment.standard_deviation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="sidita.Statistics.DataSetMoment.to_json">
-<code class="descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Statistics.html#DataSetMoment.to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Statistics.DataSetMoment.to_json" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="sidita.Statistics.DataSetMoment.unbiased_variance">
-<code class="descname">unbiased_variance</code><a class="headerlink" href="#sidita.Statistics.DataSetMoment.unbiased_variance" title="Permalink to this definition">¶</a></dt>
+<dt id="sidita.TaskQueue.Consumer.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#Consumer.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.Consumer.run" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="sidita.Statistics.WeightedDataSetMoment">
-<em class="property">class </em><code class="descclassname">sidita.Statistics.</code><code class="descname">WeightedDataSetMoment</code><a class="reference internal" href="../../_modules/sidita/Statistics.html#WeightedDataSetMoment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Statistics.WeightedDataSetMoment" title="Permalink to this definition">¶</a></dt>
+<dt id="sidita.TaskQueue.TaskQueue">
+<em class="property">class </em><code class="descclassname">sidita.TaskQueue.</code><code class="descname">TaskQueue</code><span class="sig-paren">(</span><em>number_of_workers=None</em>, <em>max_queue_size=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#TaskQueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.TaskQueue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="method">
-<dt id="sidita.Statistics.WeightedDataSetMoment.fill">
-<code class="descname">fill</code><span class="sig-paren">(</span><em>x</em>, <em>weight=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/Statistics.html#WeightedDataSetMoment.fill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.Statistics.WeightedDataSetMoment.fill" title="Permalink to this definition">¶</a></dt>
+<dt id="sidita.TaskQueue.TaskQueue.get_task">
+<code class="descname">get_task</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#TaskQueue.get_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.TaskQueue.get_task" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="sidita.Statistics.WeightedDataSetMoment.mean">
-<code class="descname">mean</code><a class="headerlink" href="#sidita.Statistics.WeightedDataSetMoment.mean" title="Permalink to this definition">¶</a></dt>
+<dl class="method">
+<dt id="sidita.TaskQueue.TaskQueue.on_result">
+<code class="descname">on_result</code><span class="sig-paren">(</span><em>task_metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#TaskQueue.on_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.TaskQueue.on_result" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="sidita.Statistics.WeightedDataSetMoment.number_of_effective_entries">
-<code class="descname">number_of_effective_entries</code><a class="headerlink" href="#sidita.Statistics.WeightedDataSetMoment.number_of_effective_entries" title="Permalink to this definition">¶</a></dt>
+<dl class="method">
+<dt id="sidita.TaskQueue.TaskQueue.on_stream_error">
+<code class="descname">on_stream_error</code><span class="sig-paren">(</span><em>task_metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#TaskQueue.on_stream_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.TaskQueue.on_stream_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.TaskQueue.TaskQueue.on_task_sent">
+<code class="descname">on_task_sent</code><span class="sig-paren">(</span><em>task_metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#TaskQueue.on_task_sent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.TaskQueue.on_task_sent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.TaskQueue.TaskQueue.on_task_submitted">
+<code class="descname">on_task_submitted</code><span class="sig-paren">(</span><em>task_metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#TaskQueue.on_task_submitted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.TaskQueue.on_task_submitted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.TaskQueue.TaskQueue.on_timeout_error">
+<code class="descname">on_timeout_error</code><span class="sig-paren">(</span><em>task_metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#TaskQueue.on_timeout_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.TaskQueue.on_timeout_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.TaskQueue.TaskQueue.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#TaskQueue.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.TaskQueue.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.TaskQueue.TaskQueue.send_stop">
+<code class="descname">send_stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#TaskQueue.send_stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.TaskQueue.send_stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.TaskQueue.TaskQueue.submit">
+<code class="descname">submit</code><span class="sig-paren">(</span><em>task</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#TaskQueue.submit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.TaskQueue.submit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.TaskQueue.TaskQueue.task_producer">
+<code class="descname">task_producer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/TaskQueue.html#TaskQueue.task_producer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.TaskQueue.TaskQueue.task_producer" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -309,10 +319,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="TaskMetaData.html" class="btn btn-neutral float-right" title="8.1.4. TaskMetaData" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="Units.html" class="btn btn-neutral float-right" title="8.1.6. Units" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="Message.html" class="btn btn-neutral" title="8.1.2. Message" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="TaskMetaData.html" class="btn btn-neutral" title="8.1.4. TaskMetaData" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>8.1.9. worker &mdash; sidita 0.1.0 documentation</title>
+  <title>8.1.8. WorkerMetrics &mdash; sidita 0.1.0 documentation</title>
   
 
   
@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="9. Development &amp; Community" href="../../development.html" />
-    <link rel="prev" title="8.1.8. WorkerMetrics" href="WorkerMetrics.html" /> 
+    <link rel="next" title="8.1.9. worker" href="worker.html" />
+    <link rel="prev" title="8.1.7. Worker" href="Worker.html" /> 
 
   
   <script src="../../static/js/modernizr.min.js"></script>
@@ -125,8 +125,8 @@
 <li class="toctree-l3"><a class="reference internal" href="TaskQueue.html">8.1.5. TaskQueue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Units.html">8.1.6. Units</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Worker.html">8.1.7. Worker</a></li>
-<li class="toctree-l3"><a class="reference internal" href="WorkerMetrics.html">8.1.8. WorkerMetrics</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">8.1.9. worker</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">8.1.8. WorkerMetrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="worker.html">8.1.9. worker</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference-manual.html#indexes">8.2. Indexes</a></li>
@@ -190,13 +190,13 @@
         
           <li><a href="../sidita.html">8.1. sidita</a> &raquo;</li>
         
-      <li>8.1.9. worker</li>
+      <li>8.1.8. WorkerMetrics</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/api/sidita/worker.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/api/sidita/WorkerMetrics.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -209,9 +209,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sidita.worker">
-<span id="worker"></span><h1>8.1.9. worker<a class="headerlink" href="#module-sidita.worker" title="Permalink to this headline">¶</a></h1>
-<p>Implements default main function for workers.</p>
+  <div class="section" id="module-sidita.WorkerMetrics">
+<span id="workermetrics"></span><h1>8.1.8. WorkerMetrics<a class="headerlink" href="#module-sidita.WorkerMetrics" title="Permalink to this headline">¶</a></h1>
+<p>Implements worker metrics.</p>
+<dl class="class">
+<dt id="sidita.WorkerMetrics.WorkerMetrics">
+<em class="property">class </em><code class="descclassname">sidita.WorkerMetrics.</code><code class="descname">WorkerMetrics</code><span class="sig-paren">(</span><em>worker_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/WorkerMetrics.html#WorkerMetrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.WorkerMetrics.WorkerMetrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="sidita.WorkerMetrics.WorkerMetrics.dump_statistics">
+<code class="descname">dump_statistics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/WorkerMetrics.html#WorkerMetrics.dump_statistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.WorkerMetrics.WorkerMetrics.dump_statistics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.WorkerMetrics.WorkerMetrics.register_crash">
+<code class="descname">register_crash</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/WorkerMetrics.html#WorkerMetrics.register_crash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.WorkerMetrics.WorkerMetrics.register_crash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.WorkerMetrics.WorkerMetrics.register_memory">
+<code class="descname">register_memory</code><span class="sig-paren">(</span><em>memory</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/WorkerMetrics.html#WorkerMetrics.register_memory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.WorkerMetrics.WorkerMetrics.register_memory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.WorkerMetrics.WorkerMetrics.register_restart">
+<code class="descname">register_restart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/WorkerMetrics.html#WorkerMetrics.register_restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.WorkerMetrics.WorkerMetrics.register_restart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.WorkerMetrics.WorkerMetrics.register_task_time">
+<code class="descname">register_task_time</code><span class="sig-paren">(</span><em>task_time</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/WorkerMetrics.html#WorkerMetrics.register_task_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.WorkerMetrics.WorkerMetrics.register_task_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sidita.WorkerMetrics.WorkerMetrics.register_timeout">
+<code class="descname">register_timeout</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sidita/WorkerMetrics.html#WorkerMetrics.register_timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sidita.WorkerMetrics.WorkerMetrics.register_timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -222,10 +258,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../../development.html" class="btn btn-neutral float-right" title="9. Development &amp; Community" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="worker.html" class="btn btn-neutral float-right" title="8.1.9. worker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="WorkerMetrics.html" class="btn btn-neutral" title="8.1.8. WorkerMetrics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="Worker.html" class="btn btn-neutral" title="8.1.7. Worker" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

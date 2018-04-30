@@ -7,36 +7,41 @@
  Overview
 ==========
 
-What is sidita ?
----------------------
+What is Sidita ?
+----------------
 
-sidita is an open source Python module which provides a |Python|_ ....
+Sidita is a Python module which implements a distributed task queue featuring an intermediate
+solution between the |multiprocessing module|_ and a task scheduler like |Celery|_.
 
-How is sidita licensed ?
------------------------------
+The Sidita use case corresponds to the case where you need to run CPU bound tasks in parallel and
+you require an immunity to crashes, memory leaks and overruns.  Theses requirements are met by a
+monitored subprocess implementation.
 
-sidita is licensed under the `GPLv3 <https://www.gnu.org/licenses/quick-guide-gplv3.en.html>`_.
+How is Sidita licensed ?
+------------------------
 
-Going further with sidita
-------------------------------
+Sidita is licensed under the `GPLv3 <https://www.gnu.org/licenses/quick-guide-gplv3.en.html>`_.
 
-The best way to know what you can do with sidita, and to learn it, is to look at the examples:
+Going further with Sidita
+-------------------------
 
- * :ref:`sidita Reference Manual <reference-manual-page>`
- * :ref:`Bibliography <bibliography-page>`
+The best way to know what you can do with Sidita, and to learn it, is to look these pages :
 
-Which platforms are supported by sidita ?
-----------------------------------------------
+ * :ref:`First Steps <first-steps-page>`
+ * :ref:`Sidita Reference Manual <reference-manual-page>`
 
-sidita runs on Linux, Windows 64-bit and Mac OS X.
+Which platforms are supported by Sidita ?
+-----------------------------------------
 
-How to install sidita ?
-----------------------------
+Sidita runs on Linux, Windows 64-bit and Mac OS X.
 
-The procedure to install sidita is described in the :ref:`Installation Manual <installation-page>`.
+How to install Sidita ?
+-----------------------
+
+The procedure to install Sidita is described in the :ref:`Installation Manual <installation-page>`.
 
 Which version of Python is required ?
 -------------------------------------
 
-sidita requires Python 3 and the version 3.5 is recommended so as to benefit from the new *@* syntax
+Sidita requires Python 3 and the version 3.5 is recommended so as to benefit from the new *@* syntax
 for units.
