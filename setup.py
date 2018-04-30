@@ -46,9 +46,9 @@ def read_requirement():
 setup_dict.update(dict(
     # include_package_data=True, # Look in MANIFEST.in
     packages=find_packages(exclude=['unit-test']),
-    scripts=glob.glob('bin/*'),
+    # scripts=glob.glob('bin/*'),
     package_data={
-        # 'sidita.Config': ['logging.yml'],
+        'sidita.Logging': ['logging.yml'],
     },
 
     platforms='any',
@@ -65,9 +65,6 @@ setup_dict.update(dict(
         ],
 
     install_requires=read_requirement(),
-    # [
-    #     'PyYAML',
-    # ],
 ))
 
 ####################################################################################################
