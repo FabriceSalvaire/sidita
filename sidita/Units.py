@@ -18,7 +18,7 @@
 #
 ####################################################################################################
 
-"""Module to implement some units like duration and byte.
+"""Implements some units like duration and byte.
 
 See also :mod:`datetime.timedelta` for duration.
 
