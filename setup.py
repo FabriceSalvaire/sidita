@@ -57,11 +57,14 @@ setup_dict.update(dict(
     # cf. http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         'Development Status :: 5 - Production/Stable',
+        'Framework :: AsyncIO',
+        'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: System :: Distributed Computing',
+        'Topic :: System :: Hardware :: Symmetric Multi-processing',
         ],
 
     install_requires=read_requirement(),
