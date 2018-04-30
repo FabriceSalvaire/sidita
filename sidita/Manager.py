@@ -31,73 +31,12 @@ import sys
 import psutil
 
 from .Message import AsyncMessageStream
-from .Statistics import DataSetMoment
+from .Units import to_MB
+from .WorkerMetrics import WorkerMetrics
 
 ####################################################################################################
 
 _module_logger = logging.getLogger(__name__)
-
-####################################################################################################
-
-def to_MB(x):
-    return x/1024**2
-
-####################################################################################################
-
-class WorkerMetrics:
-
-    ##############################################
-
-    def __init__(self, number_of_workers=0):
-
-        self._crash = 0
-        self._restart = {i:0 for i in range(number_of_workers)}
-        self._memory = {i:DataSetMoment() for i in range(number_of_workers)}
-        self._task_time = {i:DataSetMoment() for i in range(number_of_workers)}
-
-    ##############################################
-
-    def add_crash(self):
-        self._crash += 1
-
-    ##############################################
-
-    def add_restart(self, worker_id):
-        self._restart[worker_id] += 1
-
-    ##############################################
-
-    def add_memory(self, worker_id, memory):
-
-        self._memory[worker_id].fill(memory)
-
-    ##############################################
-
-    def add_task_time(self, worker_id, task_time):
-
-        # if worker_id not in self._task_time:
-        #     self._task_time[worker_id] = DataSetMoment()
-
-        self._task_time[worker_id].fill(task_time)
-
-    ##############################################
-
-    def dump_statistics(self):
-
-        text = 'Worker Statistics\n'
-        for worker_id in self._task_time.keys():
-            memory = self._memory[worker_id]
-            task_time = self._task_time[worker_id]
-            text += '  Worker @{0}: {1.number_of_entries} Tasks\n'.format(worker_id, task_time)
-            text += '    number of restarts: {}\n'.format(self._restart[worker_id])
-            if memory.number_of_entries:
-                avg_memory = to_MB(memory.mean)
-                text += '    avg memory: {:.1f} MB\n'.format(avg_memory)
-            if task_time.number_of_entries:
-                text += '    avg task time: {0.mean:.3f}s\n'.format(task_time)
-            text += '\n'
-        text += '  Crash {}'.format(self._crash)
-        return text
 
 ####################################################################################################
 
@@ -204,7 +143,7 @@ class Manager:
         self._max_memory = max_memory
         self._memory_check_interval = memory_check_interval
 
-        self._worker_metrics = WorkerMetrics(self._number_of_workers)
+        self._worker_metrics = [WorkerMetrics(i) for i in range(self._number_of_workers)]
 
     ##############################################
 
@@ -237,7 +176,8 @@ class Manager:
         ))
         loop.close()
 
-        self._logger.info(self._worker_metrics.dump_statistics())
+        for worker_metrics in self._worker_metrics:
+            self._logger.info(worker_metrics.dump_statistics())
 
     ##############################################
 
@@ -269,9 +209,11 @@ class Manager:
 
     async def _task_consumer(self, worker_id):
 
+        worker_metrics = self._worker_metrics[worker_id]
+
         process, message_stream = await self._create_worker(worker_id)
         dead = False
-        self._worker_metrics.add_restart(worker_id)
+        worker_metrics.register_restart()
 
         last_memory_check = datetime.now()
 
@@ -288,7 +230,7 @@ class Manager:
                     if process_memory > self._max_memory:
                         self._logger.info('Worker @{} has reached memory limit {:.1f} > {:.1f} MB'.format(
                             worker_id, to_MB(process_memory), to_MB(self._max_memory)))
-                        self._worker_metrics.add_memory(worker_id, process_memory)
+                        worker_metrics.register_memory(process_memory)
                         process.terminate()
                         await asyncio.sleep(1) # Fixme: better ?
                         dead = True
@@ -297,7 +239,7 @@ class Manager:
                 self._logger.info('Restart Worker @{}'.format(worker_id))
                 process, message_stream = await self._create_worker(worker_id)
                 dead = False
-                self._worker_metrics.add_restart(worker_id)
+                worker_metrics.register_restart()
 
             task_metadata.submit(worker_id)
             message_stream.send(task_metadata.task)
@@ -305,18 +247,18 @@ class Manager:
 
             try:
                 task_metadata.result = await message_stream.receive()
-                self._worker_metrics.add_task_time(task_metadata.worker_id, task_metadata.task_time_s)
+                worker_metrics.register_task_time(task_metadata.task_time_s)
                 self.on_result(task_metadata)
             except asyncio.streams.IncompleteReadError:
                 if process.returncode is not None:
-                    self._worker_metrics.add_crash()
+                    worker_metrics.register_crash()
                     self._logger.info('Worker @{} is dead'.format(worker_id))
                     dead = True
 
         self._logger.info('Exit worker @{}'.format(worker_id))
         if not dead:
             process_memory = self._get_process_memory(process)
-            self._worker_metrics.add_memory(worker_id, process_memory)
+            worker_metrics.register_memory(process_memory)
             try:
                 process.terminate()
                 await asyncio.sleep(1) # Fixme: better ?

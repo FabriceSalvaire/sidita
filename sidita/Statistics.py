@@ -97,6 +97,11 @@ class DataSetMoment:
 
     ##############################################
 
+    def __bool__(self):
+        return bool(self._number_of_entries)
+
+    ##############################################
+
     @property
     def number_of_entries(self):
         return self._number_of_entries

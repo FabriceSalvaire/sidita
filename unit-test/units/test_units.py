@@ -20,62 +20,40 @@
 
 ####################################################################################################
 
-import sidita.Logging
-logger = sidita.Logging.setup_logging('sidita')
-
-####################################################################################################
-
-from datetime import timedelta
-from pathlib import Path
-import random
-import sys
 import unittest
 
-from sidita.Manager import Manager
+from sidita.Units import *
 
 ####################################################################################################
 
-class MyManager(Manager):
-
-    _logger = logger.getChild('MyManager')
-
-    ##############################################
-
-    async def task_producer(self):
-
-        N = 1000*4
-
-        for i in range(1, N + 1):
-            self._logger.info('Producing {}/{}'.format(i, N))
-            # simulate i/o operation using sleep
-            # await asyncio.sleep(random.random())
-            message = {
-                'action': 'run',
-                'payload': 'message {}'.format(i),
-            }
-            await self.submit(message)
-
-        await self.send_stop()
-
-####################################################################################################
-
-class TestTaskQueue(unittest.TestCase):
+class TestUnits(unittest.TestCase):
 
     ##############################################
 
     def test(self):
 
-        # sys.path
+        self.assertEqual(int(1@u_kB), 1024**1)
+        self.assertEqual(int(1@u_MB), 1024**2)
+        self.assertEqual(int(1@u_GB), 1024**3)
+        self.assertEqual(int(1@u_TB), 1024**4)
+        self.assertEqual(int(1@u_PB), 1024**5)
 
-        manager = MyManager(
-            python_path=Path(__file__).resolve().parent,
-            worker_module='TestWorker',
-            worker_cls='TestWorker',
-            max_queue_size=100,
-            max_memory=100*1024**2,
-            memory_check_interval=timedelta(seconds=5),
-        )
-        manager.run()
+        self.assertEqual(int(1@u_kB * 10), 1024*10)
+        self.assertEqual(int(10 * 1@u_kB), 1024*10)
+        unit = 1@u_kB
+        unit *= 10
+        self.assertEqual(int(unit), 1024*10)
+
+        self.assertEqual((1@u_MB) / (1@u_kB), 1024)
+
+        self.assertEqual(int(1@u_min), 60)
+        self.assertEqual(int(1@u_hour), 60*60)
+        self.assertEqual(int(1@u_day), 24*60*60)
+
+        self.assertEqual(float(1@u_min * 2.1), 60 * 2.1)
+        unit = 1@u_min
+        unit *= 2.1
+        self.assertEqual(int(unit), 60*2.1)
 
 ####################################################################################################
 
