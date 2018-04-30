@@ -70,9 +70,13 @@ else:
 
 ####################################################################################################
 
+from sidita import __version__ as sidita_version
+
+####################################################################################################
+
 setup_dict = dict(
     name='sidita',
-    version='0.1.0',
+    version=sidita_version,
     author='Fabrice Salvaire',
     author_email='fabrice.salvaire@orange.fr',
     description='...',

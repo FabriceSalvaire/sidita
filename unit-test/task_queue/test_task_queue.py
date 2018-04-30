@@ -31,7 +31,7 @@ import random
 import sys
 import unittest
 
-from sidita.TaskQueue import TaskQueue
+from sidita import TaskQueue
 
 ####################################################################################################
 
