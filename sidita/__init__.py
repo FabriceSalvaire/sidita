@@ -21,3 +21,4 @@
 __version__ = '0.1.0'
 
 from .TaskQueue import TaskQueue
+from .TaskMetaData import TaskState

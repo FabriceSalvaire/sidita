@@ -59,18 +59,13 @@ class Worker:
             output_stream=sys.stdout,
         )
 
-        self._pool = []
-
         while True:
-            message = message_stream.receive()
-            self._logger.info('Worker @{} received {}'.format(self._worker_id, message))
-            # time.sleep(random.random()/1000)
-            time.sleep(random.random()*10)
-            # if random.random() < .1:
-            #     1/0
-            self._pool.append(np.ones(1024*100))
-            message = {
-                'status': 'completed',
-                'payload': message['payload'],
-            }
-            message_stream.send(message)
+            task = message_stream.receive()
+            self._logger.info('Worker @{} received {}'.format(self._worker_id, task))
+            result = self.on_task(task)
+            message_stream.send(result)
+
+    ##############################################
+
+    def on_task(self, task):
+        return task

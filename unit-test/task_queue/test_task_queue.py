@@ -31,7 +31,7 @@ import random
 import sys
 import unittest
 
-from sidita import TaskQueue
+from sidita import TaskQueue, TaskState
 
 ####################################################################################################
 
@@ -41,21 +41,66 @@ class MyTaskQueue(TaskQueue):
 
     ##############################################
 
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self._tasks = {}
+
+    ##############################################
+
+    def __iter__(self):
+        return iter(self._tasks.values())
+
+    ##############################################
+
     async def task_producer(self):
 
         N = 10
 
         for i in range(1, N + 1):
             self._logger.info('Producing {}/{}'.format(i, N))
-            # simulate i/o operation using sleep
+            # simulate workload
             # await asyncio.sleep(random.random())
-            message = {
+            task = {
                 'action': 'run',
                 'payload': 'message {}'.format(i),
             }
-            await self.submit(message)
+            await self.submit(task)
 
         await self.send_stop()
+
+    ##############################################
+
+    def on_task_submitted(self, task_metadata):
+
+        super().on_task_submitted(task_metadata)
+        print(task_metadata.id)
+        self._tasks[task_metadata.id] = task_metadata
+
+    ##############################################
+
+    def on_task_sent(self, task_metadata):
+
+        super().on_task_sent(task_metadata)
+
+    ##############################################
+
+    def on_result(self, task_metadata):
+
+        super().on_result(task_metadata)
+
+    ##############################################
+
+    def on_timeout_error(self, task_metadata):
+
+        pass
+
+    ##############################################
+
+    def on_stream_error(self, task_metadata):
+
+        pass
 
 ####################################################################################################
 
@@ -77,6 +122,9 @@ class TestTaskQueue(unittest.TestCase):
             task_timeout=timedelta(seconds=1),
         )
         task_queue.run()
+
+        for task in task_queue:
+            self.assertEqual(task.state, TaskState.READY)
 
 ####################################################################################################
 

@@ -26,30 +26,50 @@
 
 __all__ = [
     'TaskMetaData',
+    'TaskState',
 ]
 
 ####################################################################################################
 
 from datetime import datetime
+from enum import Enum
+
+####################################################################################################
+
+class TaskState(Enum):
+
+    SUBMITTED = 0
+    DISPATCHED = 1
+    READY = 2
+    TIMEOUT = 3
+    CRASHED = 4
 
 ####################################################################################################
 
 class TaskMetaData:
 
-    LAST_TASK_ID = -1
+    __LAST_TASK_ID__ = -1
+
+    ##############################################
+
+    @classmethod
+    def new_tak_id(cls):
+
+        cls.__LAST_TASK_ID__ += 1
+        return cls.__LAST_TASK_ID__
 
     ##############################################
 
     def __init__(self, task):
 
         self._task = task
-        self.LAST_TASK_ID += 1
-        self._task_id = self.LAST_TASK_ID
+        self._id = self.new_tak_id()
+        self._state = TaskState.SUBMITTED
         self._result = None
 
         self._woker_id = None
         self._submitted_date = datetime.now()
-        self._sent_date = None
+        self._dispatch_date = None
         self._result_date = None
 
     ##############################################
@@ -59,8 +79,12 @@ class TaskMetaData:
         return self._task
 
     @property
-    def task_id(self):
-        return self._task_id
+    def id(self):
+        return self._id
+
+    @property
+    def state(self):
+        return self._state
 
     @property
     def result(self):
@@ -75,7 +99,7 @@ class TaskMetaData:
         return self._submitted_date
 
     @property
-    def sent_date(self):
+    def dispatch_date(self):
         return self._submitted_date
 
     @property
@@ -84,23 +108,40 @@ class TaskMetaData:
 
     @property
     def task_time(self):
-        return self._result_date - self._sent_date
+        return self._result_date - self._dispatch_date
 
     @property
     def task_time_s(self):
-        return (self._result_date - self._sent_date).total_seconds()
+        return (self._result_date - self._dispatch_date).total_seconds()
 
     ##############################################
 
-    def submit(self, worker_id):
+    def dispatch(self, worker_id):
 
         self._worker_id = worker_id
-        self._sent_date = datetime.now()
+        self._dispatch_date = datetime.now()
+        self._state = TaskState.DISPATCHED
+
+    ##############################################
+
+    def _set_result(self, state, value=None):
+
+        self._state = state
+        self._result = value
+        self._result_date = datetime.now()
 
     ##############################################
 
     @result.setter
     def result(self, value):
+        self._set_result(TaskState.READY, value)
 
-        self._result = value
-        self._result_date = datetime.now()
+    ##############################################
+
+    def set_timeout(self):
+        self._set_result(TaskState.TIMEOUT)
+
+    ##############################################
+
+    def set_crashed(self):
+        self._set_result(TaskState.CRASHED)

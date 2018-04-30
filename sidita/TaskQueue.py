@@ -125,7 +125,7 @@ class Consumer:
                 await self._create_worker()
 
             # submit task
-            task_metadata.submit(self._id)
+            task_metadata.dispatch(self._id)
             self._message_stream.send(task_metadata.task)
             self._task_queue.on_task_sent(task_metadata)
 
@@ -136,11 +136,13 @@ class Consumer:
                 self._task_queue.on_result(task_metadata)
             except asyncio.TimeoutError:
                 self._logger.info('Worker @{} timeout'.format(self._id))
+                task_metadata.set_timeout()
                 self._metrics.register_timeout()
                 self._task_queue.on_timeout_error(task_metadata)
                 await self._stop_worker()
             except asyncio.streams.IncompleteReadError:
                 if self._process.returncode is not None:
+                    task_metadata.set_error()
                     self._metrics.register_crash()
                     self._logger.info('Worker @{} is dead'.format(self._id))
                     self._process = None

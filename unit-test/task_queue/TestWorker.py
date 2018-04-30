@@ -25,9 +25,44 @@ logger = sidita.Logging.setup_logging('sidita-worker')
 
 ####################################################################################################
 
+import numpy as np
+import logging
+import random
+import sys
+import time
+
 from sidita.Worker import Worker
 
 ####################################################################################################
 
 class TestWorker(Worker):
+
     _logger = logger.getChild('Worker')
+
+    ##############################################
+
+    def __init__(self, worker_id):
+
+        super().__init__(worker_id)
+
+        self._pool = []
+
+    ##############################################
+
+    def on_task(self, task):
+
+        # simulate workload
+        # time.sleep(random.random()/1000)
+        # time.sleep(random.random()*10)
+
+        # simulate crash
+        # if random.random() < .1:
+        #     1/0
+
+        # simulate memory load
+        # self._pool.append(np.ones(1024*100))
+
+        return {
+            'status': 'completed',
+            'payload': task['payload'],
+        }
