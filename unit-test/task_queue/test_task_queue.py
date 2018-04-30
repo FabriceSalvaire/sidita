@@ -28,10 +28,10 @@ logger = sidita.Logging.setup_logging('sidita')
 from datetime import timedelta
 from pathlib import Path
 import random
-import sys
 import unittest
 
 from sidita import TaskQueue, TaskState
+from sidita.Units import u_MB
 
 ####################################################################################################
 
@@ -75,7 +75,6 @@ class MyTaskQueue(TaskQueue):
     def on_task_submitted(self, task_metadata):
 
         super().on_task_submitted(task_metadata)
-        print(task_metadata.id)
         self._tasks[task_metadata.id] = task_metadata
 
     ##############################################
@@ -110,14 +109,12 @@ class TestTaskQueue(unittest.TestCase):
 
     def test(self):
 
-        # sys.path
-
         task_queue = MyTaskQueue(
             python_path=Path(__file__).resolve().parent,
-            worker_module='TestWorker',
+            worker_module='TestWorker', # cannot define TestWorker in unit-test file
             worker_cls='TestWorker',
             max_queue_size=100,
-            max_memory=100*1024**2,
+            max_memory=100@u_MB,
             memory_check_interval=timedelta(seconds=5),
             task_timeout=timedelta(seconds=1),
         )

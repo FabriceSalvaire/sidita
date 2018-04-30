@@ -18,7 +18,9 @@
 #
 ####################################################################################################
 
-__version__ = '0.1.0'
+__version__ = '1.0.0'
 
 from .TaskQueue import TaskQueue
 from .TaskMetaData import TaskState
+from .Worker import Worker
+

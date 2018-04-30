@@ -31,7 +31,7 @@ import random
 import sys
 import time
 
-from sidita.Worker import Worker
+from sidita import Worker
 
 ####################################################################################################
 
