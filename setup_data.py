@@ -79,9 +79,9 @@ setup_dict = dict(
     version=sidita_version,
     author='Fabrice Salvaire',
     author_email='fabrice.salvaire@orange.fr',
-    description='...',
+    description='Simple Distributed Task Queue : multiprocessing < sidita < celery',
     license='GPLv3',
-    keywords= 'foo bar',
+    keywords= 'distributed task queue asyncio multiprocessing',
     url='https://github.com/FabriceSalvaire/sidita',
     long_description=long_description,
 )
