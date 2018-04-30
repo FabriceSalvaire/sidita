@@ -89,10 +89,10 @@ Answers to frequent questions
 
 .. rst-class:: column column2
 
-:ref:`examples-page`
-====================
+:ref:`first-steps-page`
+=======================
 
-Many examples to learn how to use sidita.
+First steps with sidita.
 
 .. rst-class:: column column2
 
@@ -148,6 +148,7 @@ If you want to donate to the project or need a more professional support.
   installation.rst
   faq.rst
   design-notes.rst
+  first-steps.rst
   reference-manual.rst
   development.rst
   how-to-refer.rst

@@ -25,8 +25,9 @@ Sidita is licensed under the `GPLv3 <https://www.gnu.org/licenses/quick-guide-gp
 Going further with Sidita
 -------------------------
 
-The best way to know what you can do with Sidita, and to learn it, is to look at the examples:
+The best way to know what you can do with Sidita, and to learn it, is to look these pages :
 
+ * :ref:`First Steps <first-steps-page>`
  * :ref:`Sidita Reference Manual <reference-manual-page>`
 
 Which platforms are supported by Sidita ?
