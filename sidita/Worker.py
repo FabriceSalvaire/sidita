@@ -63,6 +63,7 @@ class Worker:
             task = message_stream.receive()
             self._logger.info('Worker @{} received {}'.format(self._worker_id, task))
             result = self.on_task(task)
+            # self._logger.info('Worker @{} write back {}'.format(self._worker_id, result))
             message_stream.send(result)
 
     ##############################################

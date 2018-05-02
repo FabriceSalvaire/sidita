@@ -45,6 +45,11 @@ _module_logger = logging.getLogger(__name__)
 
 ####################################################################################################
 
+class WorkerInitError(Exception):
+    pass
+
+####################################################################################################
+
 class Consumer:
 
     DEFAULT_WORKER_MAIN = Path(__file__).resolve().parent.joinpath('worker.py')
@@ -58,6 +63,7 @@ class Consumer:
     def __init__(self,
                  worker_id,
                  task_queue,
+                 init_worker=None,
                  worker_main=DEFAULT_WORKER_MAIN,
                  python_path=None,
                  worker_module=DEFAULT_WORKER_MODULE,
@@ -69,6 +75,7 @@ class Consumer:
 
         self._id = worker_id
         self._task_queue = task_queue
+        self._init_worker = init_worker
         self._worker_main = worker_main
         self._python_path = python_path
         self._worker_module = worker_module
@@ -216,6 +223,25 @@ class Consumer:
         )
 
         self._metrics.register_restart()
+
+        if self._init_worker is not None:
+            task = {
+                'action': 'init_worker',
+                'data': self._init_worker
+            }
+
+            # submit task
+            self._message_stream.send(task)
+
+            # await result
+            try:
+                await self._message_stream.receive()
+            except asyncio.TimeoutError:
+                self._logger.info('Worker @{} timeout during init'.format(self._id))
+                raise WorkerInitError
+            except asyncio.streams.IncompleteReadError:
+                self._logger.info('Worker @{} read error during init'.format(self._id))
+                raise WorkerInitError
 
 ####################################################################################################
 
