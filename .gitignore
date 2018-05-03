@@ -1,5 +1,13 @@
 *~
 __pycache__
 
+.pytest_cache/
+.tox/
+build/
+dist/
 doc/sphinx/build/
 doc/sphinx/source/api/
+sidita.egg-info/
+
+template-variables.txt
+tools/license-model-gpl.py
