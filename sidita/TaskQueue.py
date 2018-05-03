@@ -106,6 +106,9 @@ class Consumer:
 
     async def run(self):
 
+        # Fixme: useful, versus subclassing ???
+        self._task_queue.on_start_consumer(self)
+
         last_memory_check = datetime.now()
 
         while True:
@@ -159,6 +162,9 @@ class Consumer:
         self._logger.info('Stop worker @{}'.format(self._id))
         if not self.dead:
             await self._stop_worker()
+
+        # Fixme: useful, versus subclassing ???
+        self._task_queue.on_consumer_stopped(self)
 
     ##############################################
 
@@ -261,6 +267,15 @@ class TaskQueue:
         self._max_queue_size = max_queue_size
         self._consumer_kwargs = kwargs
 
+        self._queue = None
+        self._running = None
+
+    ##############################################
+
+    @property
+    def is_running(self):
+        return bool(self._running)
+
     ##############################################
 
     @staticmethod
@@ -278,32 +293,49 @@ class TaskQueue:
 
     ##############################################
 
-    def run(self):
+    def iter_on_number_of_workers(self):
+        return range(self._number_of_workers)
+
+    ##############################################
+
+    def run(self, auxiliary_coroutines=None):
 
         loop = self._get_event_loop()
         self._queue = asyncio.Queue(maxsize=self._max_queue_size, loop=loop)
 
+        self._consumer_running = [asyncio.Future(loop=loop)
+                                  for i in self.iter_on_number_of_workers()]
+        # self._running = asyncio.gather(*self._consumer_running, loop=loop) # Fixme: don't work ???
+        self._running = self._number_of_workers
+
         task_producer = self.task_producer()
         task_consumers = [Consumer(i, self, **self._consumer_kwargs)
-                          for i in range(self._number_of_workers)]
+                          for i in self.iter_on_number_of_workers()]
 
-        loop.run_until_complete(asyncio.gather(
+        coroutines = [
             task_producer,
             *[task_consumer.run() for task_consumer in task_consumers],
-        ))
-        loop.close()
+        ]
+        # Some auxiliary coroutines do run concurrently in the event loop
+        if auxiliary_coroutines is not None:
+            coroutines += auxiliary_coroutines
 
-        for consumer in task_consumers:
-            self._logger.info(consumer.metrics.dump_statistics())
+        # Fixme: useful, versus subclassing ???
+        # Fixme: (task_producer, task_consumers, auxiliary_coroutines) is a mix of cls and coro !
+        self.on_start_event_loop(task_consumers)
+        try:
+            loop.run_until_complete(asyncio.gather(*coroutines))
+        except asyncio.CancelledError:
+            pass # Fixme: ok ??? used to stop quickly auxiliary_coroutines
+        loop.close()
+        self.on_closed_event_loop(task_consumers)
 
     ##############################################
 
     async def task_producer(self):
-
+        raise NotImplementedError
         # self.submit(message)
         # self.send_stop()
-
-        raise NotImplementedError
 
     ##############################################
 
@@ -319,41 +351,70 @@ class TaskQueue:
 
         # indicate the producer is done
         self._logger.info('Send stop to workers')
-        for i in range(self._number_of_workers):
+        for i in self.iter_on_number_of_workers():
             await self._queue.put(None)
 
     ##############################################
 
     async def get_task(self):
-
         return await self._queue.get()
 
     ##############################################
 
-    def on_task_submitted(self, task_metadata):
+    def on_start_event_loop(self, task_consumers):
+        pass
 
+    ##############################################
+
+    def on_closed_event_loop(self, task_consumers):
+
+        for consumer in task_consumers:
+            self._logger.info(consumer.metrics.dump_statistics())
+
+    ##############################################
+
+    def on_start_consumer(self, consumer):
+        pass
+
+    ##############################################
+
+    def on_consumer_stopped(self, consumer):
+
+        self._logger.info('consumer stopped @{}'.format(consumer.id))
+        self._consumer_running[consumer.id].set_result(False)
+        self._running -= 1
+
+        # if self._running.done():
+        if not self.is_running:
+            # self._running.set_result(False)
+            self.on_all_consumer_stopped()
+
+    ##############################################
+
+    def on_all_consumer_stopped(self):
+        self._logger.info('all consumer stopped')
+
+    ##############################################
+
+    def on_task_submitted(self, task_metadata):
         self._logger.info('Submitted task {0.task}'.format(task_metadata))
 
     ##############################################
 
     def on_task_sent(self, task_metadata):
-
         self._logger.info('Task {0.task} sent to @{0.worker_id}'.format(task_metadata))
 
     ##############################################
 
     def on_result(self, task_metadata):
-
         self._logger.info('Result for task {0.task} from @{0.worker_id}\n{0.result}'.format(task_metadata))
 
     ##############################################
 
     def on_timeout_error(self, task_metadata):
-
         pass
 
     ##############################################
 
     def on_stream_error(self, task_metadata):
-
         pass
